@@ -9,9 +9,7 @@ import { Swarm2DRenderer } from './components/Swarm2DRenderer';
 import { TreeGraphRenderer } from './components/TreeGraphRenderer';
 import { StorytellerBanner } from './components/StorytellerBanner';
 import { PlaybackDock } from './components/PlaybackDock';
-import { ApiKeyModal } from './components/ApiKeyModal';
 import { generateScenarioWithGroq } from './services/groq';
-import { hasGroqApiKey } from './services/apiKey';
 import { AlertCircle, Sparkles, X, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
@@ -27,7 +25,6 @@ export default function App() {
   // AI Generation State
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
-  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
 
   // Set of currently active/online node IDs (Chaos Engineering state)
   const [activeNodeIds, setActiveNodeIds] = useState<Set<string>>(
@@ -102,13 +99,7 @@ export default function App() {
       return;
     }
 
-    // 2. Nếu là chủ đề tự do mới, gọi Groq AI
-    if (!hasGroqApiKey()) {
-      setGenerationError('MISSING_API_KEY: Vui lòng thiết lập Groq API Key để kích hoạt tính năng sinh mô phỏng kịch bản mới.');
-      setIsKeyModalOpen(true);
-      return;
-    }
-
+    // 2. Kích hoạt trực tiếp Groq AI Pipeline (Cloudflare Functions / Environment Key)
     setIsGenerating(true);
     setGenerationError(null);
 
@@ -119,10 +110,7 @@ export default function App() {
       setSearchQuery('');
     } catch (err: any) {
       console.error('Groq Generation Error:', err);
-      const msg = err?.message || 'Lỗi khi phân tích và tạo kịch bản với Groq Cloud API. Vui lòng thử lại.';
-      if (msg.includes('MISSING_API_KEY') || msg.includes('INVALID_API_KEY')) {
-        setIsKeyModalOpen(true);
-      }
+      const msg = err?.message || 'Lỗi khi phân tích và tạo kịch bản với Groq AI. Vui lòng thử lại sau giây lát.';
       setGenerationError(msg);
     } finally {
       setIsGenerating(false);
@@ -233,11 +221,10 @@ export default function App() {
               </button>
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
-              {generationError.includes('MISSING_API_KEY')
-                ? 'Chưa cấu hình Groq API Key. Bạn có thể cài đặt key hoặc thử nhanh các thuật toán / công nghệ sẵn có dưới đây.'
-                : 'Hệ thống hỗ trợ trực quan hóa tối ưu cho các thuật toán mảng, tìm đường và kiến trúc phân tán. Bạn có thể chọn xem ngay các kịch bản mẫu:'}
+              {generationError}
             </p>
             <div className="flex flex-wrap gap-2 pt-1 items-center">
+              <span className="text-[11px] font-semibold text-gray-500 mr-1">Bạn có thể chọn xem ngay các kịch bản mẫu:</span>
               {PRESET_SCENARIOS.map((s) => (
                 <button
                   key={s.id}
@@ -251,13 +238,6 @@ export default function App() {
                   {s.title}
                 </button>
               ))}
-              <button
-                type="button"
-                onClick={() => setIsKeyModalOpen(true)}
-                className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold border border-gray-300 transition-colors sm:ml-auto"
-              >
-                Cài đặt Groq Key
-              </button>
             </div>
           </div>
         )}
@@ -429,15 +409,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-
-      {/* Groq API Key Configuration Modal */}
-      <ApiKeyModal
-        isOpen={isKeyModalOpen}
-        onClose={() => setIsKeyModalOpen(false)}
-        onKeySaved={() => {
-          setGenerationError(null);
-        }}
-      />
     </div>
   );
 }

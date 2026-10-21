@@ -7,7 +7,6 @@ import {
   SwarmParticle,
   TreeNodeItem,
 } from '../types/simulation';
-import { getGroqApiKey } from './apiKey';
 
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODELS_ENDPOINT = 'https://api.groq.com/openai/v1/models';
@@ -440,113 +439,112 @@ export function sanitizeScenario(raw: any, query: string): SimulationScenario {
 }
 
 /**
- * Gọi trực tiếp Groq Cloud API bằng Web API `fetch()` thuần túy
+ * Tự động gọi Groq AI Pipeline:
+ * 1. Môi trường Cloudflare Pages: Tự động gọi qua Cloudflare Pages Function `/api/groq`
+ *    (hàm serverless bảo mật đọc trực tiếp key từ mục Variables and secrets của Cloudflare).
+ * 2. Môi trường phát triển cục bộ (Local): Nếu có biến `import.meta.env.VITE_GROQ_API_KEY`,
+ *    gọi trực tiếp Groq Cloud API.
  */
 export async function generateScenarioWithGroq(
-  userQuery: string,
-  customApiKey?: string
+  userQuery: string
 ): Promise<SimulationScenario> {
-  const key = customApiKey?.trim() || getGroqApiKey();
-  if (!key) {
-    throw new Error('MISSING_API_KEY');
-  }
-
-  // Khám phá các model khả dụng
-  let modelsToTry = CANDIDATE_MODELS;
-  const accessible = await getAccessibleGroqModels(key);
-  if (accessible.length > 0) {
-    const chatModels = accessible.filter(
-      (id) => !id.includes('whisper') && !id.includes('guard') && !id.includes('orpheus')
-    );
-    const matched = CANDIDATE_MODELS.filter((m) => chatModels.includes(m));
-    const others = chatModels.filter((m) => !matched.includes(m));
-    if (matched.length > 0 || others.length > 0) {
-      modelsToTry = Array.from(new Set([...matched, ...others, ...CANDIDATE_MODELS]));
-    }
-  }
+  const localEnvKey = (import.meta.env.VITE_GROQ_API_KEY || '').trim();
+  const hasValidLocalKey = Boolean(
+    localEnvKey &&
+    !localEnvKey.includes('your_actual_groq_api_key_here')
+  );
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 26000); // 26s timeout
+  const timeoutId = setTimeout(() => controller.abort(), 28000); // 28s timeout
+  let rawJsonContent: string | null = null;
   let lastErrorMsg = '';
 
   try {
-    for (const model of modelsToTry) {
-      try {
-        const response = await fetch(GROQ_ENDPOINT, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${key}`,
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
-              {
-                role: 'user',
-                content: `Hãy phân tích học thuật và tạo kịch bản mô phỏng trực quan tương tác hoàn chỉnh cho công nghệ/thuật toán sau: "${userQuery}"`,
-              },
-            ],
-            response_format: { type: 'json_object' },
-            temperature: 0.2,
-          }),
-        });
+    // A. Ưu tiên gọi Cloudflare Pages Function `/api/groq` (lấy tự động từ Variables and secrets)
+    try {
+      const response = await fetch('/api/groq', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            {
+              role: 'user',
+              content: `Hãy phân tích học thuật và tạo kịch bản mô phỏng trực quan tương tác hoàn chỉnh cho công nghệ/thuật toán sau: "${userQuery}"`,
+            },
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0.2,
+        }),
+      });
 
-        if (!response.ok) {
-          const errBody = await response.json().catch(() => ({}));
-          const message = errBody?.error?.message || `HTTP ${response.status}: ${response.statusText}`;
-          const code = errBody?.error?.code || '';
-
-          if (response.status === 401) {
-            throw new Error(`INVALID_API_KEY: Khóa Groq API không hợp lệ. Vui lòng kiểm tra lại key của bạn.`);
-          }
-
-          const isModelAccessError =
-            response.status === 404 ||
-            code === 'model_not_found' ||
-            message.toLowerCase().includes('does not exist') ||
-            message.toLowerCase().includes('do not have access') ||
-            message.toLowerCase().includes('model_not_found');
-
-          if (isModelAccessError) {
-            lastErrorMsg = message;
-            continue;
-          }
-
-          if (response.status === 429) {
-            throw new Error(`RATE_LIMIT: Quá giới hạn request trên Groq Cloud API. Vui lòng thử lại sau giây lát.`);
-          }
-
-          throw new Error(`GROQ_ERROR: ${message}`);
-        }
-
+      if (response.ok) {
         const data = await response.json();
-        const content = data?.choices?.[0]?.message?.content;
-        if (!content) {
-          throw new Error('EMPTY_RESPONSE: Phản hồi từ mô hình Groq rỗng.');
-        }
+        rawJsonContent = data?.choices?.[0]?.message?.content || null;
+      } else {
+        const errJson: any = await response.json().catch(() => ({}));
+        lastErrorMsg = errJson?.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+      }
+    } catch (funcErr: any) {
+      lastErrorMsg = funcErr?.message || String(funcErr);
+    }
 
-        const cleanedJson = content.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
-        const parsedJson = JSON.parse(cleanedJson);
+    // B. Nếu gọi `/api/groq` không có kết quả (ví dụ đang chạy `npm run dev` ở local không có Cloudflare Function)
+    // và có local key trong file .env, gọi trực tiếp Groq Cloud API
+    if (!rawJsonContent && hasValidLocalKey) {
+      for (const model of CANDIDATE_MODELS) {
+        try {
+          const directRes = await fetch(GROQ_ENDPOINT, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localEnvKey}`,
+            },
+            signal: controller.signal,
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: 'system', content: SYSTEM_PROMPT },
+                {
+                  role: 'user',
+                  content: `Hãy phân tích học thuật và tạo kịch bản mô phỏng trực quan tương tác hoàn chỉnh cho công nghệ/thuật toán sau: "${userQuery}"`,
+                },
+              ],
+              response_format: { type: 'json_object' },
+              temperature: 0.2,
+            }),
+          });
 
-        return sanitizeScenario(parsedJson, userQuery);
-      } catch (err: any) {
-        if (
-          err.message?.includes('INVALID_API_KEY') ||
-          err.message?.includes('RATE_LIMIT') ||
-          err.name === 'AbortError'
-        ) {
-          throw err;
+          if (directRes.ok) {
+            const data = await directRes.json();
+            rawJsonContent = data?.choices?.[0]?.message?.content || null;
+            if (rawJsonContent) break;
+          } else {
+            const errJson: any = await directRes.json().catch(() => ({}));
+            lastErrorMsg = errJson?.error?.message || `HTTP ${directRes.status}`;
+          }
+        } catch (dirErr: any) {
+          lastErrorMsg = dirErr?.message || String(dirErr);
         }
-        lastErrorMsg = err?.message || String(err);
       }
     }
 
-    throw new Error(`GROQ_ERROR: Không thể gọi các model Groq (${modelsToTry.join(', ')}). Chi tiết: ${lastErrorMsg}`);
+    if (!rawJsonContent) {
+      throw new Error(
+        lastErrorMsg || 'Không thể kết nối Groq AI. Vui lòng kiểm tra biến môi trường VITE_GROQ_API_KEY hoặc GROQ_API_KEY trên Cloudflare.'
+      );
+    }
+
+    const cleanedJson = rawJsonContent.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+    const parsedJson = JSON.parse(cleanedJson);
+    return sanitizeScenario(parsedJson, userQuery);
   } catch (error: any) {
     if (error.name === 'AbortError') {
-      throw new Error('TIMEOUT: Quá thời gian chờ (26 giây) khi kết nối Groq Cloud API.');
+      throw new Error('TIMEOUT: Quá thời gian chờ (28 giây) khi kết nối Groq Cloud AI.');
     }
     throw error;
   } finally {
