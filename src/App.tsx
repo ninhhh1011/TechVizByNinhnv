@@ -42,17 +42,24 @@ export default function App() {
     setActiveNodeIds(new Set(scenario.nodes.map((n) => n.id)));
   }, []);
 
-  // Filter presets based on search query
+  // Filter presets based on search query (hỗ trợ bóc tách tiền tố "thuật toán", "công nghệ")
   const filteredScenarios = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return allScenarios;
+    const cleanQ = q.replace(/^(thuật toán|giải thuật|công nghệ|hệ thống|mô hình)\s+/i, '').trim();
     return allScenarios.filter(
       (s) =>
         s.title.toLowerCase().includes(q) ||
+        (cleanQ && s.title.toLowerCase().includes(cleanQ)) ||
         (s.subtitle && s.subtitle.toLowerCase().includes(q)) ||
+        (cleanQ && s.subtitle && s.subtitle.toLowerCase().includes(cleanQ)) ||
         (s.summary && s.summary.toLowerCase().includes(q)) ||
+        (cleanQ && s.summary && s.summary.toLowerCase().includes(cleanQ)) ||
         (s.category && s.category.toLowerCase().includes(q)) ||
-        (s.tags && s.tags.some((t) => t.toLowerCase().includes(q))) ||
+        (s.tags && s.tags.some((t) => {
+          const tl = t.toLowerCase();
+          return tl.includes(q) || (cleanQ && tl.includes(cleanQ));
+        })) ||
         (s.nodes && s.nodes.some((n) => n.name.toLowerCase().includes(q)))
     );
   }, [allScenarios, searchQuery]);
@@ -68,15 +75,25 @@ export default function App() {
     const trimmed = queryText.trim();
     if (!trimmed) return;
 
-    // 1. Kiểm tra nhanh nếu từ khóa khớp với preset có sẵn
+    // 1. Kiểm tra nhanh nếu từ khóa khớp với preset có sẵn (bóc tách các từ phụ như thuật toán, giải thuật...)
     const lower = trimmed.toLowerCase();
-    const matchedPreset = allScenarios.find(
-      (s) =>
-        s.title.toLowerCase().includes(lower) ||
-        s.id.toLowerCase().includes(lower) ||
-        lower.includes(s.title.toLowerCase()) ||
-        (s.tags && s.tags.some((t) => t.toLowerCase() === lower))
-    );
+    const cleanLower = lower.replace(/^(thuật toán|giải thuật|công nghệ|hệ thống|mô hình)\s+/i, '').trim();
+    const matchedPreset = allScenarios.find((s) => {
+      const titleLower = s.title.toLowerCase();
+      const idLower = s.id.toLowerCase();
+      return (
+        titleLower.includes(lower) ||
+        (cleanLower && titleLower.includes(cleanLower)) ||
+        idLower.includes(lower) ||
+        (cleanLower && idLower.includes(cleanLower)) ||
+        lower.includes(titleLower) ||
+        (cleanLower && cleanLower.includes(titleLower)) ||
+        (s.tags && s.tags.some((t) => {
+          const tl = t.toLowerCase();
+          return tl === lower || tl === cleanLower || lower.includes(tl) || (cleanLower && cleanLower.includes(tl));
+        }))
+      );
+    });
 
     if (matchedPreset) {
       handleSelectScenario(matchedPreset);

@@ -8,7 +8,20 @@ export const gaScenario: SimulationScenario = {
   category: 'Optimization & AI',
   visualizationType: 'swarm-2d',
   rendererType: 'swarm-2d',
-  tags: ['PSO', 'Particle Swarm', 'Genetic Algorithm', 'Optimization', 'Metaheuristic', 'Global Best'],
+  tags: [
+    'PSO',
+    'Particle Swarm',
+    'Genetic Algorithm',
+    'Optimization',
+    'Metaheuristic',
+    'Global Best',
+    'GA',
+    'thuật toán GA',
+    'di truyền',
+    'giải thuật di truyền',
+    'bầy đàn',
+    'thuật toán bầy đàn'
+  ],
   description: 'Trực quan hóa thuật toán tối ưu hóa bầy đàn PSO và giải thuật di truyền: các hạt bay lượn và tăng tốc hướng về cực trị toàn cục gBest.',
   academicOverview: {
     mentalModel: 'Hình tượng đàn chim bay tìm thức ăn: không con nào biết chính xác thức ăn ở đâu, nhưng mỗi con chim đều biết vị trí tốt nhất nó từng thấy (pBest) và cả đàn cùng chia sẻ thông tin con chim nào đang ở gần thức ăn nhất (gBest). Bằng cách kết hợp quán tính và lực hút xã hội, cả đàn sẽ nhanh chóng tìm ra nguồn thức ăn.',
