@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { Search, Sparkles, Loader2, X, Compass, Terminal } from 'lucide-react';
+import { Chip, Button } from '@heroui/react';
+import { Search, Sparkles, Terminal, Loader2, X } from 'lucide-react';
 import { SimulationScenario } from '../types/simulation';
 
 interface HeroHeaderProps {
@@ -25,11 +26,11 @@ const getShortChipName = (s: SimulationScenario): string => {
     case 'binary-search':
       return 'Binary Search';
     case 'astar-dijkstra-grid':
-      return 'A* Grid';
+      return 'A* / Dijkstra';
     case 'genetic-algorithm-ga':
-      return 'PSO 2D';
+      return 'PSO / Swarm 2D';
     case 'merge-sort':
-      return 'MergeSort';
+      return 'MergeSort (Tree)';
     case 'bubble-sort':
       return 'BubbleSort';
     case 'load-balancer':
@@ -57,88 +58,105 @@ export const HeroHeader: FC<HeroHeaderProps> = ({
   };
 
   return (
-    <header className="relative w-full bg-white border-b border-slate-200/90 shadow-xs z-30 select-none">
-      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 py-2.5 flex flex-col lg:flex-row items-center justify-between gap-2.5">
-        
-        {/* 1. Left Brand Identity (Compact & Professional) */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#D91820] to-[#E31B23] flex items-center justify-center text-white shadow-sm">
-            <Compass className="w-4 h-4 animate-spin-slow" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-black tracking-tight text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
-              TechViz <span className="text-[#E31B23]">Studio</span>
-            </span>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/80">
-              Zero-Scroll v2.5
-            </span>
-          </div>
+    <header className="relative w-full bg-gradient-to-b from-[#B80D14] via-[#E31B23] to-[#F5F6F8] pt-8 pb-12 px-4 sm:px-6 lg:px-8 text-white transition-all overflow-hidden">
+      {/* Background Decorative Grid */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
+
+      <div className="relative max-w-7xl mx-auto flex flex-col items-center text-center">
+        {/* Top Glassmorphism Pill Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[16px] bg-gradient-to-br from-white/35 to-white/15 backdrop-blur-[12px] border border-white/65 shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)] mb-3">
+          <Sparkles className="w-4 h-4 text-white drop-shadow" />
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
+            PHÒNG LAB TRỰC QUAN HÓA HỆ THỐNG
+          </span>
         </div>
 
-        {/* 2. Center: High-Prominence Search Input with Immediate Accessibility */}
-        <div className="w-full lg:max-w-2xl flex-1 flex items-center">
-          <div className="w-full relative flex items-center bg-slate-50 hover:bg-slate-100/80 focus-within:bg-white rounded-xl border border-slate-300/80 focus-within:border-[#E31B23] focus-within:ring-2 focus-within:ring-red-100 transition-all p-1 shadow-2xs">
-            <Search className="w-4 h-4 text-slate-400 ml-2.5 shrink-0" />
+        {/* Title & Slogan */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-sm mb-3">
+          TechViz Sandbox <span className="font-light text-white/90">Encyclopedia</span>
+        </h1>
+        <p className="max-w-2xl text-white/90 text-sm sm:text-base mb-6 leading-relaxed">
+          Mô phỏng trực quan tương tác thuật toán &amp; công nghệ. Nhập chủ đề bất kỳ để tự động chọn visualizer và xem từng bước hoạt động sinh động.
+        </p>
+
+        {/* Central Search Bar with AI Generation Trigger (Padded container & borderless input) */}
+        <div className="w-full max-w-3xl shadow-xl rounded-2xl bg-white/95 backdrop-blur-md pl-4 sm:pl-5 pr-1.5 sm:pr-2 py-1.5 border border-white/40 mb-3 transition-all hover:shadow-2xl flex items-center gap-3">
+          {/* Icon kính lúp với khoảng đệm trái rộng rãi */}
+          <Search className="w-5 h-5 text-[#E31B23] shrink-0" />
+
+          {/* Ô nhập input co giãn mượt mà, hoàn toàn không viền, không outline */}
+          <div className="flex-1 flex items-center min-w-0">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Nhập tên thuật toán hoặc công nghệ bất kỳ (VD: MergeSort, LRU Cache, A*, Kafka...)"
-              className="w-full bg-transparent border-0 outline-none px-3 py-1.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 font-medium focus:ring-0"
+              placeholder="Nhập thuật toán hoặc công nghệ bất kỳ (VD: MergeSort, LRU Cache, BFS, RabbitMQ...)"
+              className="w-full bg-transparent border-0 outline-none text-xs sm:text-sm text-[#1A1A1A] placeholder:text-[#757575] font-medium py-2.5 focus:outline-none focus:ring-0"
+              style={{
+                border: 'none',
+                outline: 'none',
+                boxShadow: 'none',
+                background: 'transparent',
+              }}
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => onSearchChange('')}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200/60 mr-1.5 transition-colors"
+                className="p-1 text-gray-400 hover:text-[#E31B23] transition-colors shrink-0 ml-1 rounded-full hover:bg-gray-100"
+                aria-label="Xóa nội dung tìm kiếm"
                 title="Xóa tìm kiếm"
               >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-            {onGenerateWithGroq && (
-              <button
-                type="button"
-                onClick={() => searchQuery.trim() && onGenerateWithGroq(searchQuery.trim())}
-                disabled={!searchQuery.trim() || isGenerating}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#D91820] to-[#E31B23] text-white text-xs font-bold shadow-xs hover:opacity-95 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-              >
-                {isGenerating ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Sparkles className="w-3.5 h-3.5" />
-                )}
-                <span className="hidden sm:inline">Trực quan hóa</span>
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
+
+          {/* Nút bấm Trực quan hóa */}
+          {onGenerateWithGroq && (
+            <Button
+              size="md"
+              color="primary"
+              onClick={() => searchQuery.trim() && onGenerateWithGroq(searchQuery.trim())}
+              disabled={!searchQuery.trim() || isGenerating}
+              className="bg-gradient-to-r from-[#D91820] to-[#F23841] text-white font-bold text-xs sm:text-sm h-11 sm:h-12 px-4 sm:px-6 shadow-md shrink-0 rounded-xl flex items-center gap-1.5 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              startContent={
+                isGenerating ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-white" />
+                )
+              }
+            >
+              {isGenerating ? 'Đang mô phỏng...' : 'Trực quan hóa'}
+            </Button>
+          )}
         </div>
 
-        {/* 3. Right: Quick Chips Carousel (Compact & Scrollable) */}
-        <div className="w-full lg:w-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 shrink-0">
-          <span className="text-[11px] font-semibold text-slate-400 shrink-0 flex items-center gap-1 mr-1">
-            <Terminal className="w-3 h-3 text-[#E31B23]" /> Mẫu:
+        {/* Preset Quick Chips */}
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+          <span className="text-xs text-white/80 font-medium mr-1 flex items-center gap-1">
+            <Terminal className="w-3.5 h-3.5" /> Thử nhanh:
           </span>
           {scenarios.map((scenario) => {
             const isSelected = scenario.id === activeScenarioId;
             return (
-              <button
+              <Chip
                 key={scenario.id}
-                type="button"
                 onClick={() => onSelectScenario(scenario)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 border cursor-pointer ${
+                className={`cursor-pointer transition-all duration-200 font-semibold text-xs py-1 px-3 ${
                   isSelected
-                    ? 'bg-red-50 text-[#E31B23] border-red-200 shadow-2xs font-bold scale-102'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200/90 hover:bg-slate-50'
+                    ? 'bg-white text-[#E31B23] shadow-md scale-105 font-bold'
+                    : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30'
                 }`}
+                variant="flat"
               >
                 {getShortChipName(scenario)}
-              </button>
+              </Chip>
             );
           })}
         </div>
-
       </div>
     </header>
   );
