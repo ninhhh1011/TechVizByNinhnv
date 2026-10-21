@@ -354,29 +354,29 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
   }, []);
 
   return (
-    <div className="relative w-full min-h-[460px] bg-white rounded-[16px] border border-[#EDEDED] shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 sm:p-6 overflow-hidden flex flex-col justify-between select-none font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between select-none font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Background Architectural Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F5F6F8_1px,transparent_1px),linear-gradient(to_bottom,#F5F6F8_1px,transparent_1px)] bg-[size:24px_24px] opacity-70 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F1F5F9_1px,transparent_1px),linear-gradient(to_bottom,#F1F5F9_1px,transparent_1px)] bg-[size:24px_24px] opacity-70 pointer-events-none" />
 
       {/* 1. Header Toolbar of Grid Stage */}
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-[#F0F0F0] mb-3">
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100 mb-2">
         {/* Left: Title & Live Algorithm Badge */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5">
-            <span className="relative flex h-3 w-3">
+            <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E31B23] opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#E31B23]" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#E31B23]" />
             </span>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#1A1A1A]">
-              TRỰC QUAN HÓA TÌM ĐƯỜNG TỐI ƯU (GRID PATHFINDING STAGE)
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
+              Trực quan hóa Tìm đường tối ưu (Grid Path Stage)
             </span>
           </div>
 
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
-              className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full transition-colors ${
+              className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${
                 useHeuristic
-                  ? 'bg-red-50 text-[#D91820] border border-red-200'
+                  ? 'bg-red-50 text-[#E31B23] border border-red-200'
                   : 'bg-blue-50 text-blue-700 border border-blue-200'
               }`}
             >

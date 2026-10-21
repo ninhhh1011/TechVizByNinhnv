@@ -13,10 +13,7 @@ import {
   RotateCcw,
   ShieldAlert,
 } from 'lucide-react';
-import {
-  SimulationNode,
-  SimulationStep,
-} from '../types/simulation';
+import { SimulationNode, SimulationStep } from '../types/simulation';
 
 interface FlowGraphRendererProps {
   nodes: SimulationNode[];
@@ -34,23 +31,23 @@ interface NodePosition {
 }
 
 const getNodeIcon = (iconName: string) => {
-  switch (iconName.toLowerCase()) {
+  switch (iconName?.toLowerCase()) {
     case 'send':
-      return <Send className="w-5 h-5" />;
+      return <Send className="w-4 h-4" />;
     case 'layers':
-      return <Layers className="w-5 h-5" />;
+      return <Layers className="w-4 h-4" />;
     case 'cpu':
-      return <Cpu className="w-5 h-5" />;
+      return <Cpu className="w-4 h-4" />;
     case 'database':
-      return <Database className="w-5 h-5" />;
+      return <Database className="w-4 h-4" />;
     case 'server':
-      return <Server className="w-5 h-5" />;
+      return <Server className="w-4 h-4" />;
     case 'radio':
-      return <Radio className="w-5 h-5" />;
+      return <Radio className="w-4 h-4" />;
     case 'brain':
-      return <Brain className="w-5 h-5" />;
+      return <Brain className="w-4 h-4" />;
     default:
-      return <Zap className="w-5 h-5" />;
+      return <Zap className="w-4 h-4" />;
   }
 };
 
@@ -65,9 +62,8 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
   const nodeRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const [positions, setPositions] = useState<Map<string, NodePosition>>(new Map());
 
-  // 1. Phân nhóm các Node thành các Cột / Tầng (Stages / Lanes) một cách linh hoạt (từ 2 đến 6 cột)
+  // 1. Phân nhóm các Node thành các Tầng / Cột linh hoạt (từ 2 đến 6 cột)
   const layers = useMemo(() => {
-    // Thu thập danh sách các tầng xuất hiện theo thứ tự
     const layerOrder: string[] = [];
     const layerMap: Record<string, SimulationNode[]> = {};
 
@@ -80,38 +76,36 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
       layerMap[layerKey].push(node);
     });
 
-    // Nếu tất cả các node đều chung 1 tầng nhưng có nhiều node, tự động tách mỗi node thành 1 cột
     if (layerOrder.length === 1 && nodes.length > 1) {
       return nodes.map((node, idx) => ({
         key: node.id,
-        title: laneTitles?.[idx] || node.name || `Thành phần ${idx + 1}`,
+        title: laneTitles?.[idx] || node.name || `Tầng ${idx + 1}`,
         nodes: [node],
       }));
     }
 
-    // Ghép tiêu đề cột theo laneTitles truyền vào hoặc tự động suy luận thông minh
     return layerOrder.map((key, idx) => {
       let title = laneTitles?.[idx];
       if (!title) {
         switch (key) {
           case 'ingress':
           case 'client':
-            title = 'Tiếp nhận (Client / Ingress)';
+            title = 'Tiếp nhận (Ingress)';
             break;
           case 'gateway':
-            title = 'Điều phối (Gateway / Router)';
+            title = 'Điều phối (Gateway)';
             break;
           case 'compute':
           case 'service':
-            title = 'Xử lý (Compute / Service)';
+            title = 'Xử lý (Compute)';
             break;
           case 'storage':
           case 'database':
-            title = 'Dữ liệu (Storage / DB)';
+            title = 'Dữ liệu (Storage)';
             break;
           case 'egress':
           case 'worker':
-            title = 'Đầu ra (Egress / Workers)';
+            title = 'Đầu ra (Egress)';
             break;
           default:
             title = key.charAt(0).toUpperCase() + key.slice(1);
@@ -136,7 +130,7 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
     return 'grid-cols-1 sm:grid-cols-3 lg:grid-cols-6';
   }, [layers.length]);
 
-  // Measure node center positions relative to the container
+  // Measure node center positions using offset coordinates for zoom robustness
   const updatePositions = () => {
     if (!containerRef.current) return;
     const containerRect = containerRef.current.getBoundingClientRect();
@@ -160,52 +154,52 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
   useEffect(() => {
     updatePositions();
     window.addEventListener('resize', updatePositions);
-    const timer = setTimeout(updatePositions, 100);
+    const timer = setTimeout(updatePositions, 80);
     return () => {
       window.removeEventListener('resize', updatePositions);
       clearTimeout(timer);
     };
   }, [nodes, step]);
 
-  // Animation duration calculated from speed
-  const animDuration = Math.max(0.8, 2.2 / speed);
+  const animDuration = Math.max(0.7, 2.0 / speed);
+  const hasActiveHighlights = (step.activeHighlights?.length ?? 0) > 0;
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full min-h-[500px] bg-white rounded-[16px] border border-[#EDEDED] shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-5 sm:p-6 overflow-hidden flex flex-col justify-between"
+      className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between font-['Plus_Jakarta_Sans',sans-serif] select-none"
     >
-      {/* Background Architectural Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F5F6F8_1px,transparent_1px),linear-gradient(to_bottom,#F5F6F8_1px,transparent_1px)] bg-[size:28px_28px] opacity-80 pointer-events-none" />
+      {/* Background Architectural Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F1F5F9_1px,transparent_1px),linear-gradient(to_bottom,#F1F5F9_1px,transparent_1px)] bg-[size:28px_28px] opacity-70 pointer-events-none" />
 
       {/* Header of Topology Stage */}
-      <div className="relative z-10 flex items-center justify-between pb-3.5 border-b border-[#F0F0F0] mb-3">
+      <div className="relative z-10 flex items-center justify-between pb-2.5 border-b border-slate-100 mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#E31B23] animate-ping" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
-            SƠ ĐỒ TRỰC QUAN HÓA TOÀN CẢNH (TOPOLOGY STAGE)
+          <div className="w-2 h-2 rounded-full bg-[#E31B23] animate-ping" />
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
+            Sơ đồ Trực quan Hệ thống (Flow Graph Stage)
           </span>
         </div>
-        <div className="flex items-center gap-3 text-xs text-[#757575]">
-          <span className="flex items-center gap-1.5 font-medium">
-            <span className="w-2 h-2 rounded-full bg-[#E31B23]" /> Đang hoạt động
+        <div className="flex items-center gap-3 text-xs text-slate-500">
+          <span className="flex items-center gap-1.5 font-semibold text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-[#E31B23]" /> Đang xử lý
           </span>
-          <span className="flex items-center gap-1.5 font-medium">
-            <span className="w-2 h-2 rounded-full bg-red-400" /> Bị sập (Chaos)
+          <span className="flex items-center gap-1.5 font-semibold text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-slate-300" /> Chờ lượt
           </span>
         </div>
       </div>
 
-      {/* SVG Connecting Paths with Directional Arrowheads */}
+      {/* SVG Connecting Paths with Flowing Animated Strokes */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
         <defs>
-          <linearGradient id="normalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#E31B23" stopOpacity="0.7" />
+          <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#E31B23" stopOpacity="0.85" />
             <stop offset="100%" stopColor="#F23841" stopOpacity="0.95" />
           </linearGradient>
 
           <marker
-            id="packetArrow"
+            id="flowArrow"
             viewBox="0 0 10 10"
             refX="8"
             refY="5"
@@ -214,18 +208,6 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
             orient="auto-start-reverse"
           >
             <path d="M 0 1 L 9 5 L 0 9 z" fill="#E31B23" />
-          </marker>
-
-          <marker
-            id="failedArrow"
-            viewBox="0 0 10 10"
-            refX="8"
-            refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 1 L 9 5 L 0 9 z" fill="#EF4444" />
           </marker>
         </defs>
 
@@ -255,45 +237,53 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
 
           return (
             <g key={`track-${pkt.id}`}>
-              {/* Background Dashed Track */}
+              {/* Background Base Track */}
               <path
                 d={pathD}
                 fill="none"
-                stroke="#E5E7EB"
+                stroke="#E2E8F0"
                 strokeWidth="2.5"
                 strokeDasharray="4 4"
               />
-              {/* Active Directional Glow Path with Arrowhead */}
+              {/* Active Flowing Animated Dash Stream */}
               <path
                 d={pathD}
                 fill="none"
-                stroke="url(#normalGrad)"
+                stroke="url(#flowGrad)"
                 strokeWidth="2.5"
-                strokeDasharray="6 4"
-                markerEnd="url(#packetArrow)"
-                opacity="0.85"
-              />
+                strokeDasharray="8 6"
+                markerEnd="url(#flowArrow)"
+                opacity="0.9"
+              >
+                <animate
+                  attributeName="stroke-dashoffset"
+                  from="28"
+                  to="0"
+                  dur={`${Math.max(0.6, 1.6 / speed)}s`}
+                  repeatCount="indefinite"
+                />
+              </path>
             </g>
           );
         })}
       </svg>
 
-      {/* Columns with Node Cards (No truncation, natural wrapping & adaptive lane titles) */}
-      <div className={`relative z-20 grid ${gridColsClass} gap-4 sm:gap-5 my-auto py-3`}>
+      {/* Columns with Node Cards */}
+      <div className={`relative z-20 grid ${gridColsClass} gap-3 sm:gap-4 my-auto py-2`}>
         {layers.map((layer) => (
           <div
             key={layer.key}
-            className="flex flex-col gap-3 p-3 rounded-[14px] bg-[#F5F6F8]/70 border border-[#E5E7EB]/90 shadow-xs"
+            className="flex flex-col gap-2.5 p-2.5 rounded-xl bg-slate-50/80 border border-slate-200/80 shadow-2xs"
           >
-            {/* Adaptive Lane Title */}
-            <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#4B5563] px-1 pb-1.5 border-b border-gray-200/90 flex items-center justify-between">
+            {/* Lane Title */}
+            <div className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-1 pb-1 border-b border-slate-200 flex items-center justify-between">
               <span>{layer.title}</span>
-              <span className="text-[10px] font-mono text-gray-400 bg-white px-1.5 py-0.5 rounded border border-gray-200">
-                {layer.nodes.length} node
+              <span className="font-mono text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                {layer.nodes.length}
               </span>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {layer.nodes.map((node) => {
                 const isActive = activeNodeIds.has(node.id);
                 const isHighlighted = step.activeHighlights?.includes(node.id);
@@ -305,59 +295,60 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
                       if (el) nodeRefs.current.set(node.id, el);
                       else nodeRefs.current.delete(node.id);
                     }}
-                    className={`relative p-3.5 rounded-[12px] border transition-all duration-300 min-h-[135px] flex flex-col justify-between ${
+                    className={`relative p-3 rounded-xl border transition-all duration-300 min-h-[110px] flex flex-col justify-between ${
                       !isActive
-                        ? 'bg-red-50/70 border-dashed border-red-300 shadow-none'
+                        ? 'bg-red-50/60 border-dashed border-red-300 opacity-60'
                         : isHighlighted
-                        ? 'bg-[#FFFFFF] border-[#E31B23] shadow-[0_4px_16px_rgba(227,27,35,0.18)] ring-2 ring-red-100'
-                        : 'bg-[#FFFFFF] border-[#EDEDED] shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
+                        ? 'bg-white border-[#E31B23] shadow-[0_8px_24px_rgba(227,27,35,0.22)] ring-4 ring-red-100 scale-[1.02] z-20'
+                        : hasActiveHighlights
+                        ? 'bg-white/70 border-slate-200 opacity-65'
+                        : 'bg-white border-slate-200 shadow-xs hover:border-slate-300'
                     }`}
                   >
                     {/* Node Header & Icon */}
-                    <div className="flex items-start gap-2.5 mb-2">
+                    <div className="flex items-start gap-2 mb-1.5">
                       <div
-                        className={`p-2 rounded-lg transition-colors shrink-0 mt-0.5 ${
+                        className={`p-1.5 rounded-lg transition-colors shrink-0 ${
                           !isActive
                             ? 'bg-red-100 text-[#E31B23]'
                             : isHighlighted
-                            ? 'bg-gradient-to-r from-[#D91820] to-[#F23841] text-white shadow-sm'
-                            : 'bg-[#F5F6F8] text-[#5A5A5A]'
+                            ? 'bg-gradient-to-r from-[#D91820] to-[#E31B23] text-white shadow-xs'
+                            : 'bg-slate-100 text-slate-600'
                         }`}
                       >
                         {getNodeIcon(node.icon)}
                       </div>
                       <div className="min-w-0 flex-1">
-                        {/* 100% full text display with natural wrapping, zero truncation */}
                         <h4
-                          className={`text-sm font-bold break-words leading-snug ${
-                            !isActive ? 'text-red-700 line-through' : 'text-[#1A1A1A]'
+                          className={`text-xs font-black break-words leading-tight ${
+                            !isActive ? 'text-red-700 line-through' : 'text-slate-900'
                           }`}
                         >
                           {node.name}
                         </h4>
-                        <p className="text-[11px] text-[#757575] break-words leading-tight mt-0.5 font-medium">
+                        <p className="text-[10px] text-slate-500 break-words leading-tight mt-0.5 font-medium">
                           {node.role}
                         </p>
                       </div>
                     </div>
 
-                    {/* Node Description (Full pedagogical detail without line clamp) */}
-                    <p className="text-[11px] text-[#5A5A5A] leading-relaxed mb-3 break-words">
+                    {/* Node Description */}
+                    <p className="text-[10px] text-slate-600 leading-relaxed mb-2 break-words">
                       {node.description}
                     </p>
 
-                    {/* Node Footer: Adaptive Lane Tag & Real-time Status */}
-                    <div className="pt-2 border-t border-[#F0F0F0] flex items-center justify-between text-[10px]">
-                      <span className="font-semibold text-gray-500 uppercase tracking-wider text-[10px]">
+                    {/* Node Footer */}
+                    <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                      <span className="font-bold text-slate-400 uppercase tracking-wider">
                         {layer.title || node.layer}
                       </span>
                       {isActive ? (
-                        <span className="inline-flex items-center gap-1 font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                        <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           ONLINE
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full border border-red-200">
+                        <span className="inline-flex items-center gap-1 font-bold text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full border border-red-200">
                           <ShieldAlert className="w-3 h-3" />
                           CRASHED
                         </span>
@@ -371,7 +362,7 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
         ))}
       </div>
 
-      {/* Floating Animated Packets: Elevated Sky Corridor (Never obscuring Node Card contents) */}
+      {/* Floating Animated Packets */}
       <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
         <AnimatePresence>
           {(step.packets || []).map((pkt) => {
@@ -396,23 +387,22 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
             const toPos = positions.get(toId);
             if (!fromPos || !toPos) return null;
 
-            // Elevated trajectory: fly right above the cards in the open clearance zone
             const pStartX = fromPos.x;
-            const pStartY = Math.max(20, fromPos.y - fromPos.height / 2 - 28);
+            const pStartY = Math.max(16, fromPos.y - fromPos.height / 2 - 24);
             const pEndX = packetStatus === 'failed' && isTargetDown ? (fromPos.x + toPos.x) / 2 : toPos.x;
-            const pEndY = Math.max(20, toPos.y - toPos.height / 2 - 28);
+            const pEndY = Math.max(16, toPos.y - toPos.height / 2 - 24);
 
             return (
               <motion.div
                 key={`pkt-${pkt.id}-${step.stepIndex}-${toId}-${packetStatus}`}
                 initial={{
-                  x: pStartX - 60,
+                  x: pStartX - 50,
                   y: pStartY,
                   opacity: 0,
                   scale: 0.85,
                 }}
                 animate={{
-                  x: [pStartX - 60, pEndX - 60],
+                  x: [pStartX - 50, pEndX - 50],
                   y: [pStartY, pEndY],
                   opacity: [0, 1, 1, 0.95],
                   scale: [0.85, 1, 1, 0.9],
@@ -421,37 +411,27 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
                   duration: animDuration,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  repeatDelay: 0.3,
+                  repeatDelay: 0.25,
                 }}
                 className="absolute left-0 top-0"
               >
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-xl backdrop-blur-md border ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-md backdrop-blur-md border ${
                     packetStatus === 'failed'
                       ? 'bg-red-600 text-white border-red-300 shadow-red-500/40'
                       : packetStatus === 'rerouted'
                       ? 'bg-amber-600 text-white border-amber-300 shadow-amber-500/40'
-                      : 'bg-gradient-to-r from-[#D91820] to-[#F23841] text-white border-white/80 shadow-[0_4px_14px_rgba(227,27,35,0.45)]'
+                      : 'bg-gradient-to-r from-[#D91820] to-[#E31B23] text-white border-white/80 shadow-[0_4px_12px_rgba(227,27,35,0.4)]'
                   }`}
                 >
                   {packetStatus === 'failed' ? (
-                    <AlertTriangle className="w-3.5 h-3.5 text-white animate-bounce shrink-0" />
+                    <AlertTriangle className="w-3 h-3 text-white animate-bounce shrink-0" />
                   ) : packetStatus === 'rerouted' ? (
-                    <RotateCcw className="w-3.5 h-3.5 text-white animate-spin shrink-0" />
+                    <RotateCcw className="w-3 h-3 text-white animate-spin shrink-0" />
                   ) : (
-                    <span className="w-2 h-2 rounded-full bg-white animate-ping shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping shrink-0" />
                   )}
-                  <span className="font-mono text-[11px] whitespace-nowrap">{pkt.label}</span>
-                  {packetStatus === 'rerouted' && (
-                    <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                      Rerouted
-                    </span>
-                  )}
-                  {packetStatus === 'failed' && (
-                    <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                      Dropped
-                    </span>
-                  )}
+                  <span className="font-mono text-[10px] whitespace-nowrap">{pkt.label}</span>
                 </div>
               </motion.div>
             );

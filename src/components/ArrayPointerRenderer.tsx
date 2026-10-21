@@ -157,14 +157,14 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
 
   if (!arrayData || array.length === 0) {
     return (
-      <div className="relative w-full min-h-[460px] bg-white rounded-[16px] border border-[#EDEDED] shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-8 flex flex-col items-center justify-center text-center">
-        <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#E31B23] flex items-center justify-center mb-4">
-          <Info className="w-7 h-7" />
+      <div className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-8 flex flex-col items-center justify-center text-center font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="w-12 h-12 rounded-xl bg-red-50 text-[#E31B23] flex items-center justify-center mb-3">
+          <Info className="w-6 h-6" />
         </div>
-        <h3 className="text-base font-bold text-[#1A1A1A] mb-1">
+        <h3 className="text-sm font-bold text-slate-800 mb-1">
           Chưa có dữ liệu mảng (Array Step Data)
         </h3>
-        <p className="text-xs text-[#757575] max-w-md">
+        <p className="text-xs text-slate-500 max-w-sm">
           Bước này hiện chưa cấu hình <code>arrayData</code>. Vui lòng chọn một kịch bản thuật toán như QuickSort hoặc Binary Search.
         </p>
       </div>
@@ -172,47 +172,47 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
   }
 
   return (
-    <div className="relative w-full min-h-[460px] bg-white rounded-[16px] border border-[#EDEDED] shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-5 sm:p-6 overflow-hidden flex flex-col justify-between">
+    <div className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between select-none font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Nền lưới kỹ thuật Architectural Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F5F6F8_1px,transparent_1px),linear-gradient(to_bottom,#F5F6F8_1px,transparent_1px)] bg-[size:28px_28px] opacity-80 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#F1F5F9_1px,transparent_1px),linear-gradient(to_bottom,#F1F5F9_1px,transparent_1px)] bg-[size:28px_28px] opacity-70 pointer-events-none" />
 
       {/* 1. Header của Stage */}
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#F0F0F0] mb-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#E31B23] animate-ping" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
-            TRỰC QUAN HÓA MẢNG &amp; CON TRỎ (ARRAY &amp; TWO-POINTER STAGE)
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100 mb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-[#E31B23] animate-ping" />
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800">
+            Trực quan hóa Mảng &amp; Hai Con Trỏ (Array &amp; Two-Pointer Stage)
           </span>
         </div>
 
         {/* Feature status badges */}
-        <div className="flex items-center gap-2 text-[11px] font-medium text-[#5A5A5A]">
-          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F5F6F8] border border-gray-200">
+        <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-600">
+          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200">
             {barView ? (
               <>
-                <BarChart3 className="w-3.5 h-3.5 text-[#E31B23]" /> Cột cao độ
+                <BarChart3 className="w-3 h-3 text-[#E31B23]" /> Cột cao độ
               </>
             ) : (
               <>
-                <Box className="w-3.5 h-3.5 text-[#E31B23]" /> Ô vuông (Boxes)
+                <Box className="w-3 h-3 text-[#E31B23]" /> Ô vuông (Boxes)
               </>
             )}
           </span>
 
           <span
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border ${
+            className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full border ${
               audioEnabled
-                ? 'bg-red-50/70 border-red-200 text-[#D91820]'
-                : 'bg-gray-100 border-gray-200 text-gray-400'
+                ? 'bg-red-50 text-[#E31B23] border-red-200 font-bold'
+                : 'bg-slate-100 border-slate-200 text-slate-400'
             }`}
           >
             {audioEnabled ? (
               <>
-                <Volume2 className="w-3.5 h-3.5" /> Bíp: Bật
+                <Volume2 className="w-3 h-3" /> Âm thanh: Bật
               </>
             ) : (
               <>
-                <VolumeX className="w-3.5 h-3.5" /> Bíp: Tắt
+                <VolumeX className="w-3 h-3" /> Âm thanh: Tắt
               </>
             )}
           </span>
