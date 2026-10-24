@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useLayoutEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Server,
@@ -20,6 +20,7 @@ interface FlowGraphRendererProps {
   step: SimulationStep;
   activeNodeIds: Set<string>;
   speed: number;
+  isPlaying?: boolean;
   laneTitles?: string[];
 }
 
@@ -56,6 +57,7 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
   step,
   activeNodeIds,
   speed,
+  isPlaying = false,
   laneTitles,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -134,16 +136,18 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
   const updatePositions = () => {
     if (!containerRef.current) return;
     const containerRect = containerRef.current.getBoundingClientRect();
+    const scaleX = containerRect.width / containerRef.current.offsetWidth || 1;
+    const scaleY = containerRect.height / containerRef.current.offsetHeight || 1;
     const newPositions = new Map<string, NodePosition>();
 
     nodeRefs.current.forEach((el, id) => {
       if (el) {
         const rect = el.getBoundingClientRect();
         newPositions.set(id, {
-          x: rect.left - containerRect.left + rect.width / 2,
-          y: rect.top - containerRect.top + rect.height / 2,
-          width: rect.width,
-          height: rect.height,
+          x: (rect.left - containerRect.left + rect.width / 2) / scaleX,
+          y: (rect.top - containerRect.top + rect.height / 2) / scaleY,
+          width: rect.width / scaleX,
+          height: rect.height / scaleY,
         });
       }
     });
@@ -151,24 +155,33 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
     setPositions(newPositions);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updatePositions();
-    window.addEventListener('resize', updatePositions);
-    const timer = setTimeout(updatePositions, 80);
+    const observer = new ResizeObserver(updatePositions);
+    if (containerRef.current) observer.observe(containerRef.current);
+    nodeRefs.current.forEach((node) => observer.observe(node));
     return () => {
-      window.removeEventListener('resize', updatePositions);
-      clearTimeout(timer);
+      observer.disconnect();
     };
   }, [nodes, step]);
 
   const animDuration = Math.max(0.7, 2.0 / speed);
   const hasActiveHighlights = (step.activeHighlights?.length ?? 0) > 0;
+  const ids = new Set(nodes.map((node) => node.id));
+  const packets = step.packets || [];
+  if (ids.size !== nodes.length || nodes.some((node) => !node.id) || new Set(packets.map((packet) => packet.id)).size !== packets.length ||
+      packets.some((packet) => !packet.id || !ids.has(packet.fromNodeId) || !ids.has(packet.toNodeId) || (packet.fallbackToNodeId && !ids.has(packet.fallbackToNodeId)))) {
+    return <div role="alert" className="p-6 bg-white rounded-xl border border-red-200">Dữ liệu luồng có ID trùng hoặc tham chiếu không hợp lệ.</div>;
+  }
 
   return (
     <div
       ref={containerRef}
       className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between font-['Plus_Jakarta_Sans',sans-serif] select-none"
     >
+      <ul className="sr-only" aria-label="Luồng gói tin">
+        {(step.packets || []).map((packet) => <li key={packet.id}>{packet.label}: {packet.fromNodeId} → {packet.toNodeId}</li>)}
+      </ul>
       {/* Background Architectural Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#F1F5F9_1px,transparent_1px),linear-gradient(to_bottom,#F1F5F9_1px,transparent_1px)] bg-[size:28px_28px] opacity-70 pointer-events-none" />
 
@@ -255,13 +268,13 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
                 markerEnd="url(#flowArrow)"
                 opacity="0.9"
               >
-                <animate
+                {isPlaying && <animate
                   attributeName="stroke-dashoffset"
                   from="28"
                   to="0"
                   dur={`${Math.max(0.6, 1.6 / speed)}s`}
                   repeatCount="indefinite"
-                />
+                />}
               </path>
             </g>
           );
@@ -395,24 +408,24 @@ export const FlowGraphRenderer: React.FC<FlowGraphRendererProps> = ({
             return (
               <motion.div
                 key={`pkt-${pkt.id}-${step.stepIndex}-${toId}-${packetStatus}`}
-                initial={{
+                initial={isPlaying ? {
                   x: pStartX - 50,
                   y: pStartY,
                   opacity: 0,
                   scale: 0.85,
-                }}
-                animate={{
+                } : false}
+                animate={isPlaying ? {
                   x: [pStartX - 50, pEndX - 50],
                   y: [pStartY, pEndY],
                   opacity: [0, 1, 1, 0.95],
                   scale: [0.85, 1, 1, 0.9],
-                }}
-                transition={{
+                } : { x: pEndX - 50, y: pEndY, opacity: 1, scale: 1 }}
+                transition={isPlaying ? {
                   duration: animDuration,
                   repeat: Infinity,
                   ease: 'easeInOut',
                   repeatDelay: 0.25,
-                }}
+                } : { duration: 0 }}
                 className="absolute left-0 top-0"
               >
                 <div

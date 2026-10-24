@@ -1,0 +1,11 @@
+{
+  "source": "Synthetic locked contract negatives; not captured live model outputs.",
+  "cases": [
+    { "id": "missing-version", "expected": "error", "proposal": { "title": "Unknown" } },
+    { "id": "empty-steps", "expected": "error", "proposal": { "scenarioVersion": 1, "title": "Empty", "rendererType": "array-pointer", "nodes": [], "steps": [] } },
+    { "id": "self-verified", "expected": "unsupported", "proposal": { "scenarioVersion": 1, "status": "verified-simulation", "title": "Invented verification", "rendererType": "array-pointer", "nodes": [], "steps": [{ "stepIndex": 1, "title": "Initial", "explanation": "No reviewed source", "arrayData": { "array": [2, 1], "pointers": [] } }] } },
+    { "id": "wrong-array-type", "expected": "error", "proposal": { "scenarioVersion": 1, "title": "Bad array", "rendererType": "array-pointer", "nodes": [], "steps": [{ "stepIndex": 1, "title": "Initial", "explanation": "Bad number", "arrayData": { "array": [2, "one"], "pointers": [] } }] } },
+    { "id": "unknown-endpoint", "expected": "error", "proposal": { "scenarioVersion": 1, "title": "Bad flow", "rendererType": "flow-graph", "nodes": [{ "id": "a" }, { "id": "b" }], "steps": [{ "stepIndex": 1, "title": "Send", "explanation": "Broken reference", "packets": [{ "id": "p", "fromNodeId": "a", "toNodeId": "missing" }] }] } },
+    { "id": "unreviewed-swarm", "expected": "unsupported", "proposal": { "scenarioVersion": 1, "title": "Unreviewed score", "rendererType": "swarm-2d", "nodes": [], "steps": [{ "stepIndex": 1, "title": "Positions", "explanation": "No reviewed objective", "swarmData": { "particles": [{ "id": "p1", "x": 20, "y": 30 }] } }] } }
+  ]
+}

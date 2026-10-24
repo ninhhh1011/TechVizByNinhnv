@@ -9,15 +9,18 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { SimulationStep, SwarmParticle } from '../types/simulation';
+import { pickBestParticle } from '../utils/renderState';
 
 export interface Swarm2DRendererProps {
   step: SimulationStep;
   speed?: number;
+  isPlaying?: boolean;
 }
 
 export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
   step,
   speed = 1,
+  isPlaying = false,
 }) => {
   // 1. Resolve swarmData from step.swarmData or step.visualData
   const swarmData = useMemo(() => {
@@ -30,28 +33,22 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
         particles: vd.particles as SwarmParticle[],
         target: vd.target,
         gBest: vd.gBest,
-        iteration: vd.iteration ?? step.stepIndex,
+        iteration: vd.iteration,
         bestFitness: vd.gBest?.fitness,
+        objective: vd.objective as 'min' | 'max' | undefined,
       };
     }
     return undefined;
-  }, [step.swarmData, step.visualData, step.stepIndex]);
+  }, [step.swarmData, step.visualData]);
 
   const particles = swarmData?.particles || [];
-  const target = swarmData?.target || swarmData?.gBest || { x: 50, y: 50, label: 'Cực trị tối ưu Toàn cục (gBest)' };
-  const iteration = swarmData?.iteration ?? step.stepIndex;
+  const target = swarmData?.target || swarmData?.gBest;
+  const iteration = swarmData?.iteration;
 
   // Best particle calculation
   const bestParticle = useMemo(() => {
-    if (particles.length === 0) return null;
-    const explicitBest = particles.find((p) => p.isBest);
-    if (explicitBest) return explicitBest;
-    return [...particles].sort((a, b) => {
-      const distA = Math.hypot(a.x - target.x, a.y - target.y);
-      const distB = Math.hypot(b.x - target.x, b.y - target.y);
-      return distA - distB;
-    })[0];
-  }, [particles, target]);
+    return pickBestParticle(particles, swarmData?.objective);
+  }, [particles, swarmData?.objective]);
 
   const springTransition = {
     type: 'spring' as const,
@@ -78,15 +75,18 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
 
   return (
     <div className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between select-none font-['Plus_Jakarta_Sans',sans-serif]">
+      <ul className="sr-only" aria-label="Trạng thái các hạt">
+        {particles.map((p) => <li key={p.id}>{p.label || p.id}: x={p.x}, y={p.y}, fitness={p.fitness ?? 'chưa có'}{bestParticle?.id === p.id ? ', dẫn đầu theo dữ liệu được khai báo' : ''}</li>)}
+      </ul>
       {/* Background Architectural Coordinate Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#F1F5F9_1px,transparent_1px),linear-gradient(to_bottom,#F1F5F9_1px,transparent_1px)] bg-[size:32px_32px] opacity-75 pointer-events-none" />
 
       {/* Decorative Contour Lines (Equipotential Gradient Field) */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+      {target && <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
         <circle cx={`${target.x}%`} cy={`${target.y}%`} r="60" fill="none" stroke="#E31B23" strokeWidth="1" strokeDasharray="3 3" />
         <circle cx={`${target.x}%`} cy={`${target.y}%`} r="120" fill="none" stroke="#E31B23" strokeWidth="1" strokeDasharray="4 4" />
         <circle cx={`${target.x}%`} cy={`${target.y}%`} r="190" fill="none" stroke="#E31B23" strokeWidth="1" strokeDasharray="5 5" />
-      </svg>
+      </svg>}
 
       {/* 1. Header Toolbar */}
       <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100 mb-2">
@@ -98,10 +98,12 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-[#E31B23] font-bold text-[10px]">
-            <Activity className="w-3 h-3" />
-            Vòng lặp: #{iteration}
-          </span>
+          {iteration !== undefined && (
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-[#E31B23] font-bold text-[10px]">
+              <Activity className="w-3 h-3" />
+              Vòng lặp: #{iteration}
+            </span>
+          )}
           <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 font-semibold text-[10px]">
             <Layers className="w-3 h-3 text-[#E31B23]" />
             Số hạt: {particles.length}
@@ -119,7 +121,7 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
         <span className="absolute top-1 left-2 text-[9px] font-mono text-slate-400">&uarr; Trục Y</span>
 
         {/* Global Optimum Target (gBest / Extrema) */}
-        <div
+        {target && <div
           className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 transition-all duration-500"
           style={{ left: `${target.x}%`, top: `${target.y}%` }}
         >
@@ -128,13 +130,13 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
 
           <div className="relative flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#D91820] to-[#E31B23] text-white text-[10px] font-extrabold shadow-md border border-white">
             <Target className="w-3 h-3 animate-spin" />
-            <span className="font-mono">gBest ({Math.round(target.x)}, {Math.round(target.y)})</span>
+            <span className="font-mono">Mục tiêu khai báo ({Math.round(target.x)}, {Math.round(target.y)})</span>
           </div>
-        </div>
+        </div>}
 
         {/* Particles */}
         {particles.map((p, idx) => {
-          const isBest = p.isBest || (bestParticle && bestParticle.id === p.id);
+          const isBest = bestParticle?.id === p.id;
           const px = Math.max(4, Math.min(96, p.x));
           const py = Math.max(4, Math.min(96, p.y));
 
@@ -147,7 +149,7 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
                 left: `${px}%`,
                 top: `${py}%`,
               }}
-              transition={springTransition}
+              transition={isPlaying ? springTransition : { duration: 0 }}
               className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer group"
             >
               {/* Particle Vector Arrow */}
@@ -195,15 +197,15 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
       {/* 3. Footer Metadata */}
       <div className="relative z-10 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-500 gap-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="font-bold text-slate-700">Hội tụ:</span>
+          <span className="font-bold text-slate-700">Mục tiêu:</span>
           <span>
-            Điểm cực trị: <strong className="text-[#E31B23]">({Math.round(target.x)}, {Math.round(target.y)})</strong>
+            <strong className="text-[#E31B23]">{target ? `(${Math.round(target.x)}, ${Math.round(target.y)})` : 'Chưa khai báo mục tiêu'}</strong>
           </span>
           {bestParticle && (
             <>
               <span>&bull;</span>
               <span>
-                Dẫn đầu: <strong className="text-emerald-700">{bestParticle.label || bestParticle.id}</strong> (f = {bestParticle.fitness ?? 'Tối ưu'})
+                Dẫn đầu: <strong className="text-emerald-700">{bestParticle.label || bestParticle.id}</strong> (f = {bestParticle.fitness ?? 'chưa có điểm'})
               </span>
             </>
           )}
@@ -214,7 +216,7 @@ export const Swarm2DRenderer: FC<Swarm2DRendererProps> = ({
             <span className="w-2 h-2 rounded-full bg-[#E31B23]" /> Vị trí hiện tại
           </span>
           <span className="flex items-center gap-1 text-slate-400">
-            Vector gia tốc hướng gBest
+            Vector vận tốc được khai báo
           </span>
         </div>
       </div>

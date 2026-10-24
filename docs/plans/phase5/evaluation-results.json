@@ -1,0 +1,50 @@
+{
+  "source": "Synthetic locked contract negatives; not captured live model outputs.",
+  "date": "2026-10-22",
+  "promptVersion": "proposal-v1",
+  "model": "llama-3.3-70b-versatile",
+  "counts": {
+    "accepted": 0,
+    "unsupported": 2,
+    "error": 4
+  },
+  "falseAccepted": 0,
+  "rows": [
+    {
+      "id": "missing-version",
+      "expected": "error",
+      "actual": "error",
+      "pass": true
+    },
+    {
+      "id": "empty-steps",
+      "expected": "error",
+      "actual": "error",
+      "pass": true
+    },
+    {
+      "id": "self-verified",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "pass": true
+    },
+    {
+      "id": "wrong-array-type",
+      "expected": "error",
+      "actual": "error",
+      "pass": true
+    },
+    {
+      "id": "unknown-endpoint",
+      "expected": "error",
+      "actual": "error",
+      "pass": true
+    },
+    {
+      "id": "unreviewed-swarm",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "pass": true
+    }
+  ]
+}

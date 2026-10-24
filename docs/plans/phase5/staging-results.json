@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-22T07:50:06.155Z",
+  "url": "https://techvizbyninhnv.pages.dev/",
+  "httpStatus": 204,
+  "optionsAllow": null,
+  "corsOrigin": "*",
+  "evidenceLabelPresent": false,
+  "groqKeyPatternFound": true,
+  "errors": [],
+  "compatibleWithLocalRelease": false,
+  "limit": "Read-only page/assets/OPTIONS checks. No Groq request, provider spending, deployment mutation or claim of exhaustive secret detection."
+}

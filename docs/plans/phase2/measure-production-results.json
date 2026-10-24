@@ -1,0 +1,122 @@
+[
+  {
+    "id": "A1",
+    "mode": "Legacy renderer",
+    "viewport": "1440x900",
+    "p50Ms": 14.3,
+    "p95Ms": 16.8,
+    "maxMs": 17.3,
+    "domNodes": 97,
+    "idleRafFps": 60
+  },
+  {
+    "id": "A1",
+    "mode": "Snapshot",
+    "viewport": "1440x900",
+    "p50Ms": 15,
+    "p95Ms": 16.2,
+    "maxMs": 16.9,
+    "domNodes": 41,
+    "idleRafFps": 60
+  },
+  {
+    "id": "A1",
+    "mode": "Event + reducer",
+    "viewport": "1440x900",
+    "p50Ms": 14.4,
+    "p95Ms": 15.8,
+    "maxMs": 15.9,
+    "domNodes": 41,
+    "idleRafFps": 60
+  },
+  {
+    "id": "F1",
+    "mode": "Legacy renderer",
+    "viewport": "1440x900",
+    "p50Ms": 14.6,
+    "p95Ms": 15.6,
+    "maxMs": 16.5,
+    "domNodes": 135,
+    "idleRafFps": 60
+  },
+  {
+    "id": "F1",
+    "mode": "Snapshot",
+    "viewport": "1440x900",
+    "p50Ms": 13.8,
+    "p95Ms": 15.2,
+    "maxMs": 15.2,
+    "domNodes": 44,
+    "idleRafFps": 60
+  },
+  {
+    "id": "F1",
+    "mode": "Event + reducer",
+    "viewport": "1440x900",
+    "p50Ms": 14.8,
+    "p95Ms": 15.9,
+    "maxMs": 16.2,
+    "domNodes": 44,
+    "idleRafFps": 60
+  },
+  {
+    "id": "A1",
+    "mode": "Legacy renderer",
+    "viewport": "390x844",
+    "p50Ms": 14.9,
+    "p95Ms": 16.2,
+    "maxMs": 17.4,
+    "domNodes": 97,
+    "idleRafFps": 60
+  },
+  {
+    "id": "A1",
+    "mode": "Snapshot",
+    "viewport": "390x844",
+    "p50Ms": 15.2,
+    "p95Ms": 17.2,
+    "maxMs": 17.2,
+    "domNodes": 41,
+    "idleRafFps": 60
+  },
+  {
+    "id": "A1",
+    "mode": "Event + reducer",
+    "viewport": "390x844",
+    "p50Ms": 14.6,
+    "p95Ms": 17.2,
+    "maxMs": 18,
+    "domNodes": 41,
+    "idleRafFps": 60
+  },
+  {
+    "id": "F1",
+    "mode": "Legacy renderer",
+    "viewport": "390x844",
+    "p50Ms": 14.4,
+    "p95Ms": 17.3,
+    "maxMs": 17.8,
+    "domNodes": 135,
+    "idleRafFps": 60
+  },
+  {
+    "id": "F1",
+    "mode": "Snapshot",
+    "viewport": "390x844",
+    "p50Ms": 14.9,
+    "p95Ms": 16.2,
+    "maxMs": 16.6,
+    "domNodes": 44,
+    "idleRafFps": 60
+  },
+  {
+    "id": "F1",
+    "mode": "Event + reducer",
+    "viewport": "390x844",
+    "p50Ms": 14.9,
+    "p95Ms": 15.7,
+    "maxMs": 16.1,
+    "domNodes": 44,
+    "idleRafFps": 60
+  }
+]

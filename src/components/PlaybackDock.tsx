@@ -51,7 +51,8 @@ export const PlaybackDock: FC<PlaybackDockProps> = ({
           </span>
         </div>
 
-        <div className="relative flex items-center justify-between w-full px-2 sm:px-4 py-2">
+        <div className="w-full overflow-x-auto">
+        <div className="relative flex items-center justify-between w-full px-2 sm:px-4 py-2" style={{ minWidth: totalSteps * 44 }}>
           {/* Đường dẫn nền (Connector track) */}
           <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1.5 bg-[#EDEDED] rounded-full z-0 overflow-hidden">
             <div
@@ -81,6 +82,7 @@ export const PlaybackDock: FC<PlaybackDockProps> = ({
                 }`}
                 title={`Chuyển đến Bước ${i + 1}`}
                 aria-label={`Chuyển đến Bước ${i + 1}`}
+                aria-current={isCurrent ? 'step' : undefined}
               >
                 {isPassed ? (
                   <Check className="w-4 h-4 stroke-[3]" />
@@ -90,6 +92,7 @@ export const PlaybackDock: FC<PlaybackDockProps> = ({
               </button>
             );
           })}
+        </div>
         </div>
       </div>
 
@@ -175,6 +178,7 @@ export const PlaybackDock: FC<PlaybackDockProps> = ({
               key={s}
               type="button"
               onClick={() => onSpeedChange(s)}
+              aria-pressed={speed === s}
               className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                 speed === s
                   ? 'bg-white text-[#E31B23] shadow-sm'

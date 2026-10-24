@@ -14,6 +14,7 @@ import { playValueTone } from '../utils/audio';
 export interface ArrayPointerRendererProps {
   step: SimulationStep;
   speed?: number;
+  isPlaying?: boolean;
   audioEnabled?: boolean;
   barView?: boolean;
   highlightComparisons?: boolean;
@@ -52,6 +53,7 @@ function getPointerColor(name: string, customColor?: string): { bg: string; text
 export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
   step,
   speed = 1,
+  isPlaying = false,
   audioEnabled = true,
   barView = true,
   highlightComparisons = true,
@@ -248,7 +250,7 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
 
       {/* 3. Main Interactive Array Stage */}
       <div className="relative z-10 my-auto py-6 flex-1 flex flex-col justify-center items-center">
-        <div className="w-full flex items-end justify-center gap-2.5 sm:gap-4 md:gap-5 px-2 min-h-[260px] overflow-x-auto">
+        <div className="w-full flex items-end justify-start gap-2.5 sm:gap-4 md:gap-5 px-2 min-h-[260px] overflow-x-auto" style={{ justifyContent: 'safe center' }}>
           {array.map((value, idx) => {
             const isComparing = highlightComparisons && comparingIndices.includes(idx);
             const isSwapped = swappedIndices.includes(idx);
@@ -278,8 +280,8 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
             return (
               <motion.div
                 layout
-                key={`val-${value}-${idx}`}
-                transition={springTransition}
+                key={`val-${value}-${array.slice(0, idx).filter((item) => item === value).length}`}
+                transition={isPlaying ? springTransition : { duration: 0 }}
                 className="flex flex-col items-center flex-shrink-0 group relative"
                 style={{ width: barView ? 'clamp(44px, 5.5vw, 68px)' : 'clamp(52px, 6.5vw, 76px)' }}
               >
@@ -288,7 +290,8 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
                   <AnimatePresence>
                     {elementPointers.length > 0 && (
                       <motion.div
-                        initial={{ opacity: 0, y: -8, scale: 0.8 }}
+                        initial={isPlaying ? { opacity: 0, y: -8, scale: 0.8 } : false}
+                        transition={{ duration: isPlaying ? 0.2 : 0 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -6, scale: 0.8 }}
                         className="flex flex-col items-center gap-0.5"
@@ -314,8 +317,8 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
                         </div>
                         {/* Mũi tên chỉ xuống */}
                         <motion.div
-                          animate={{ y: [0, 2, 0] }}
-                          transition={{ repeat: Infinity, duration: 1.2 }}
+                          animate={{ y: isPlaying ? [0, 2, 0] : 0 }}
+                          transition={{ repeat: isPlaying ? Infinity : 0, duration: isPlaying ? 1.2 : 0 }}
                         >
                           <ArrowDown className="w-4 h-4 text-[#E31B23]" strokeWidth={2.5} />
                         </motion.div>
@@ -328,13 +331,13 @@ export const ArrayPointerRenderer: FC<ArrayPointerRendererProps> = ({
                 <motion.div
                   layout
                   animate={
-                    isSwapped
+                    !isPlaying ? { scale: 1 } : isSwapped
                       ? { scale: [1, 1.12, 1] }
                       : isComparing
                       ? { scale: [1, 1.04, 1] }
                       : { scale: 1 }
                   }
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: isPlaying ? 0.4 : 0 }}
                   style={{
                     height: barView ? `${barHeightPx}px` : '72px',
                   }}

@@ -1,0 +1,57 @@
+- main:
+  - text: MergeSort (Cây Đệ quy Chia để Trị) Algorithms Minh họa biên soạn — chưa xác minh toàn bộ
+  - button "Thu gọn lý thuyết":
+    - img
+    - text: Thu gọn lý thuyết
+    - img
+  - text: Bước 1 / 5
+  - group: Nguồn và giới hạn
+  - img
+  - text: Bản chất & Mô hình Trực quan
+  - paragraph: "Chiến lược Chia để Trị (Divide & Conquer): Chia một bài toán lớn thành các bài toán con cùng dạng cho đến khi chúng đủ nhỏ để giải trực tiếp (mảng 1 phần tử luôn có thứ tự), sau đó hòa trộn kết quả của các bài toán con lại với nhau."
+  - img
+  - text: Cơ sở Lý thuyết & Độ phức tạp
+  - paragraph: "Độ phức tạp thời gian: O(N log N) trong mọi trường hợp (Tốt nhất, Trung bình, Xấu nhất). Không gian bộ nhớ phụ trợ: O(N) do cần mảng đệm khi trộn. Tính ổn định (Stable Sort): CÓ bảo toàn thứ tự ban đầu."
+  - img
+  - text: Ứng dụng Thực tiễn • Sắp xếp ngoài (External Sorting) cho tập dữ liệu khổng lồ không vừa RAM • Sắp xếp danh sách liên kết đơn (Singly Linked List) với O(1) bộ nhớ phụ • Được dùng làm thuật toán nền tảng trong Timsort (Python sorted, Java Arrays.sort)
+  - heading "Khởi tạo Mảng gốc (Root Node Level 0)" [level=3]
+  - paragraph: Mảng ban đầu [38, 27, 43, 3, 9, 82, 10, 19] tại gốc đệ quy. Thuật toán chuẩn bị chia đôi tại chỉ số giữa mid = 3 thành 2 bài toán con.
+  - img
+  - text: "Mã giả / Công thức thực thi Step #1 void mergeSort(int arr[], int l, int r) { if (l < r) { int m = l + (r - l) / 2; mergeSort(arr, l, m); mergeSort(arr, m + 1, r); merge(arr, l, m, r); } }"
+  - img
+  - text: Biến số & Trạng thái trực tiếp SNAPSHOT Tầng cây (Level) 0 (Root) Độ dài mảng 8 phần tử Điểm chia (mid) Chỉ số 3 Trạng thái BẮT ĐẦU PHÂN RÃ Trạng thái theo từng bước TechViz Engine v2.0
+  - button "Bật kéo khung vẽ (Pan)":
+    - img
+  - button "Thu nhỏ (-)":
+    - img
+  - button "100%"
+  - button "Phóng to (+)":
+    - img
+  - button "Đặt lại khung nhìn (1:1)":
+    - img
+  - button "Phóng to toàn màn hình":
+    - img
+  - list "Quan hệ cha con":
+    - listitem: "Gốc [8]: gốc"
+  - text: Trực quan hóa Cây & Đệ quy (Tree & Hierarchy Stage)
+  - img
+  - text: "Độ sâu: 1 tầng Tổng: 1 nút"
+  - img
+  - text: "Gốc [8] [38, 27, 43, 3, 9, 82, 10, 19] N = 8 Duyệt: Từ gốc (Root) đến nhánh lá (Leaf) • Gốc cây: Mảng chưa sắp xếp Visiting Visited Pending Tiến trình kịch bản Hoàn thành 20%"
+  - button "Chuyển đến Bước 1": B1
+  - button "Chuyển đến Bước 2": B2
+  - button "Chuyển đến Bước 3": B3
+  - button "Chuyển đến Bước 4": B4
+  - button "Chuyển đến Bước 5": B5
+  - button "Về đầu kịch bản":
+    - img
+  - button "Bước trước" [disabled]:
+    - img
+  - button "Chạy tự động"
+  - button "Bước tiếp theo":
+    - img
+  - text: "Đang xem: Bước 1 / 5"
+  - img
+  - button "0.5x"
+  - button "1x" [pressed]
+  - button "2x"

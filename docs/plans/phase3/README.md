@@ -1,0 +1,20 @@
+# P3 — Contract và cổng đúng đắn (kỹ thuật đã kiểm, chờ gate)
+
+Ngày: 2026-10-22. Yêu cầu triển khai P3 được thực hiện trên nhánh hiện tại, nhưng G0/G1 trong [PROGRESS](../PROGRESS.md) vẫn mở; kết quả này chưa được phê duyệt để gọi là mô phỏng đã kiểm chứng.
+
+| Task | Đã đưa vào code | Bằng chứng / giới hạn |
+|---|---|---|
+| P3-T1 | `scenarioContract.ts` yêu cầu `scenarioVersion: 1`, giới hạn số node/step/packet/cell, kiểm kiểu, ID, thứ tự, chỉ số và trả path/reason. Phản hồi AI tối đa 128 KiB. | Negative tests cho bước thiếu, mảng sai kiểu, endpoint, grid, tree cycle, swarm duplicate và 99 phép mutate JSON-shaped không crash. Chưa fuzz ngẫu nhiên diện rộng. |
+| P3-T2 | Validator theo năm renderer ở mức hình dạng/tham chiếu; `bubblePass` là runner xác định cho A1; `validateBubbleTrace` kiểm thứ tự event, state và vị trí chốt của A1. | A1 oracle, negative event/state và 27 input thuộc tính pass. Chưa có oracle đầy đủ cho các capability khác; không suy Big-O/optimality. |
+| P3-T3 | Preset adapter version 1 giữ nguyên object, `steps` là snapshots; App lấy 11 preset qua adapter. | [Golden manifest](preset-golden.json) khóa hash từng preset 11/11. Browser smoke 22/22 duyệt mọi bước text/packet label/reset. [Đối chiếu renderer độc lập với Git trước P3](render-parity-results.json): 120/120 trạng thái của 11 preset × desktop/mobile khớp DOM/state/layout. |
+| P3-T4 | Bỏ `sanitizeScenario` và mọi fallback tự bịa Big-O, array/grid/tree/swarm/packet; bỏ browser-key branch. Đề xuất AI hợp lệ về `unsupported`, lỗi JSON/cấu trúc về `error`; UI giữ preset đang xem và hiển thị lý do. Bỏ pseudocode chung trong banner. | Unit tests kiểm AI không vào playback. AI chưa có capability được duyệt nên không có đường `accepted` từ Groq; `partial` đã có trong union nhưng chưa dùng. |
+
+Lệnh kiểm: `node --test src/services/scenarioContract.test.mjs` (9/9), `npm run build` (exit 0), `npm run smoke:baseline` (11/11), `node docs/plans/phase3/preset-smoke.mjs` (22/22), `node docs/plans/phase3/browser-check.mjs` (4/4). Smoke chạy với Chromium headless trên Vite production preview ở 127.0.0.1:3000. Ảnh và JSON ở [baseline](../baseline/). Không thay đổi proxy server ở P3; giới hạn request/rate/deployment là P5-T2.
+
+**Gate còn mở:** P0-T4 ghi rõ chủ sở hữu cần duyệt baseline. Review oracle/miền và QA bằng subagent đã có theo yêu cầu người dùng. Sau khi duyệt baseline/ngưỡng trong [biên bản](../GATE_REVIEW.md), có thể đóng G0, công nhận G1 A/hybrid và nghiệm thu P3. Không thêm yêu cầu validator mọi family, screen reader toàn app hoặc chữ ký ADR riêng vào phạm vi P3. Trước khi mở AI cho một capability, cần oracle/review của capability đó và test false-accepted tương ứng.
+
+## Review độc lập ngày 2026-10-22
+
+Hai [subagent oracle](../reviews/oracle-a.md) [độc lập](../reviews/oracle-b.md) xác nhận 11/11 case sau khi S1/S2 bổ sung `scoreUpdates`. [Subagent QA](../reviews/qa.md) phát hiện và kiểm lại lỗi câu phủ định chứa tên Kafka: App nay chỉ chọn preset khi truy vấn khớp trọn tên, ID hoặc alias; browser check 3 negative và 1 positive pass. Smoke 22 lượt duyệt **mọi bước** của 11 preset ở desktop/mobile và kiểm title, explanation, packet label. Adapter giữ đúng cùng tham chiếu scenario và steps, không biến đổi dữ liệu preset. `validateBubbleTrace` so A1 với trace compare/swap xác định và từ chối event/state sai.
+
+**Giới hạn kiểm chứng:** `node docs/plans/phase3/render-parity.mjs` build riêng toàn bộ source `src/` từ Git `991ea6c` và source hiện tại, rồi so renderer stage mọi bước ở 1440×900 và 390×844 (22 lượt, 120 frame). So text/classes, số packet/label, SVG path, left/top/kích thước; loại pha opacity/transform thoáng qua của Framer, tắt CSS motion và đặt thời gian SVG về 0. Đây là semantic DOM/layout parity, không phải pixel hoặc animation parity. Header/banner đổi copy có chủ đích được kiểm bằng smoke riêng. Build production của cả hai bản và test exit 0; Chromium 156.0.8078.4. [Review miền](../reviews/domain.md) xác nhận P3-T2 đạt phạm vi capability A1; validator trace hiện dùng trong tests và phải được nối trước khi mở live A1 acceptance. Các capability AI khác vẫn `unsupported`; motion/playback đầy đủ tiếp tục ở P4.

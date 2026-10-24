@@ -1,0 +1,68 @@
+- main:
+  - text: QuickSort (Phân hoạch Lomuto & Đổi chỗ) Algorithms Minh họa biên soạn — chưa xác minh toàn bộ
+  - button "Thu gọn lý thuyết":
+    - img
+    - text: Thu gọn lý thuyết
+    - img
+  - text: Bước 1 / 10
+  - group: Nguồn và giới hạn
+  - img
+  - text: Bản chất & Mô hình Trực quan
+  - paragraph: Chọn một phần tử chốt (Pivot) làm ranh giới, sau đó dùng 2 con trỏ quét toàn bộ mảng để dồn tất cả các số nhỏ hơn Pivot sang bên trái và các số lớn hơn sang bên phải. Lặp lại đệ quy cho hai nửa mảng con.
+  - img
+  - text: Cơ sở Lý thuyết & Độ phức tạp
+  - paragraph: "Độ phức tạp thời gian: O(N log N) trung bình và tốt nhất; O(N^2) xấu nhất (khi mảng đã có thứ tự và luôn chọn phần tử đầu/cuối làm pivot). Không gian bộ nhớ: O(log N) do ngăn xếp đệ quy. Sắp xếp tại chỗ (In-place)."
+  - img
+  - text: Ứng dụng Thực tiễn • Thuật toán sắp xếp mặc định trong thư viện chuẩn C qsort() và C++ std::sort (kết hợp Introsort) • Hệ thống cơ sở dữ liệu sắp xếp chỉ mục trên bộ nhớ RAM
+  - heading "Khởi tạo phân hoạch (Chọn Pivot)" [level=3]
+  - paragraph: Chọn phần tử cuối cùng làm Pivot (arr[6] = 35, màu đỏ Techcombank). Con trỏ j bắt đầu duyệt từ chỉ số 0 để tìm các phần tử nhỏ hơn hoặc bằng Pivot.
+  - img
+  - text: "Mã giả / Công thức thực thi Step #1 Chưa có mã giả được kiểm chứng cho bước này."
+  - img
+  - text: Biến số & Trạng thái trực tiếp SNAPSHOT
+  - paragraph: Bước này chưa có dữ liệu biến trạng thái.
+  - text: Trạng thái theo từng bước TechViz Engine v2.0
+  - button "Bật kéo khung vẽ (Pan)":
+    - img
+  - button "Thu nhỏ (-)":
+    - img
+  - button "100%"
+  - button "Phóng to (+)":
+    - img
+  - button "Đặt lại khung nhìn (1:1)":
+    - img
+  - button "Phóng to toàn màn hình":
+    - img
+  - text: Trực quan hóa Mảng & Hai Con Trỏ (Array & Two-Pointer Stage)
+  - img
+  - text: Cột cao độ
+  - img
+  - text: "Âm thanh: Bật Chú giải: Bình thường Đang so sánh Vừa hoán đổi (Swap) Đã chốt vị trí (Sorted) j"
+  - img
+  - text: 48 [0] 15 [1] 76 [2] 23 [3] 89 [4] 60 [5] pivot
+  - img
+  - text: "35 [6] Mảng: Độ dài N ="
+  - strong: "7"
+  - text: "• Phạm vi: [15 ... 89] Tiến trình kịch bản Hoàn thành 10%"
+  - button "Chuyển đến Bước 1": B1
+  - button "Chuyển đến Bước 2": B2
+  - button "Chuyển đến Bước 3": B3
+  - button "Chuyển đến Bước 4": B4
+  - button "Chuyển đến Bước 5": B5
+  - button "Chuyển đến Bước 6": B6
+  - button "Chuyển đến Bước 7": B7
+  - button "Chuyển đến Bước 8": B8
+  - button "Chuyển đến Bước 9": B9
+  - button "Chuyển đến Bước 10": B10
+  - button "Về đầu kịch bản":
+    - img
+  - button "Bước trước" [disabled]:
+    - img
+  - button "Chạy tự động"
+  - button "Bước tiếp theo":
+    - img
+  - text: "Đang xem: Bước 1 / 10"
+  - img
+  - button "0.5x"
+  - button "1x" [pressed]
+  - button "2x"

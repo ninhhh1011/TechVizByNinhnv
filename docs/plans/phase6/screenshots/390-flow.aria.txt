@@ -1,0 +1,75 @@
+- main:
+  - text: Apache Kafka Distributed Systems Minh họa biên soạn — chưa xác minh toàn bộ
+  - button "Thu gọn lý thuyết":
+    - img
+    - text: Thu gọn lý thuyết
+    - img
+  - text: Bước 1 / 5
+  - group: Nguồn và giới hạn
+  - img
+  - text: Bản chất & Mô hình Trực quan
+  - paragraph: "Nhật ký phân tán bất biến (Distributed Commit Log): Message được ghi tuần tự nối đuôi vào các phân vùng (Partition) trên đĩa cứng, cho phép hàng ngàn Producer đẩy vào và Consumer Group đọc song song với tốc độ đĩa tuần tự cực nhanh."
+  - img
+  - text: Cơ sở Lý thuyết & Độ phức tạp
+  - paragraph: "Ghi đĩa tuần tự O(1) nhờ Zero-Copy (sendfile) và OS PageCache. Tính nhất quán: Định lý PACELC - trong trường hợp phân vùng mạng (Partition), hệ thống đánh đổi tính khả dụng để bảo toàn tính nhất quán (CP) với ack=all."
+  - img
+  - text: Ứng dụng Thực tiễn • Xương sống luân chuyển dữ liệu sự kiện thời gian thực (Event-Driven Architecture) tại Uber, Netflix, LinkedIn • Đồng bộ dữ liệu biến đổi cơ sở dữ liệu CDC (Change Data Capture) với Debezium • Xử lý luồng giao dịch ngân hàng thời gian thực chống gian lận (Fraud Detection)
+  - heading "Phát sinh thông điệp (Publish Message)" [level=3]
+  - paragraph: Producer Service đóng gói luồng giao dịch tài chính liên tục và gửi vào Kafka Topic được chia làm 2 Partition (P0 & P1) để xử lý song song.
+  - img
+  - text: "Mã giả / Công thức thực thi Step #1 ProducerRecord<String, byte[]> record = new ProducerRecord<>(\"tcb-txns\", key, payload); producer.send(record, (metadata, err) -> callback(metadata));"
+  - img
+  - text: Biến số & Trạng thái trực tiếp SNAPSHOT Producer Status STREAMING Target Topic tcb-transactions Batch Size 500 msgs Ack Level all (-1) Network Roundtrip 0.35ms Trạng thái theo từng bước TechViz Engine v2.0
+  - button "Bật kéo khung vẽ (Pan)":
+    - img
+  - button "Thu nhỏ (-)":
+    - img
+  - button "100%"
+  - button "Phóng to (+)":
+    - img
+  - button "Đặt lại khung nhìn (1:1)":
+    - img
+  - button "Phóng to toàn màn hình":
+    - img
+  - list "Luồng gói tin":
+    - listitem: "Batch Txn [P0, P1]: kafka-producer → kafka-broker"
+  - text: Sơ đồ Trực quan Hệ thống (Flow Graph Stage) Đang xử lý Chờ lượt
+  - img
+  - text: Phát sinh (Producer) 1
+  - img
+  - heading "Producer Gateway" [level=4]
+  - paragraph: Message Generator
+  - paragraph: Dịch vụ phát sinh hàng ngàn giao dịch/giây và đẩy theo đợt vào Kafka Topic.
+  - text: Phát sinh (Producer) ONLINE Điều phối (Broker Cluster) 1
+  - img
+  - heading "Kafka Broker Cluster" [level=4]
+  - paragraph: Partition Coordinator
+  - paragraph: Quản lý Partition Log, gán Partition cho Consumer Group và điều phối Rebalance.
+  - text: Điều phối (Broker Cluster) ONLINE Phân vùng (Partition Logs) 2
+  - img
+  - heading "Consumer Worker A" [level=4]
+  - paragraph: Group Member 1
+  - paragraph: Thành viên Consumer Group, phụ trách xử lý thông điệp từ Partition 0.
+  - text: Phân vùng (Partition Logs) ONLINE
+  - img
+  - heading "Consumer Worker B" [level=4]
+  - paragraph: Group Member 2
+  - paragraph: Thành viên Consumer Group, phụ trách xử lý thông điệp từ Partition 1.
+  - text: Phân vùng (Partition Logs) ONLINE Batch Txn [P0, P1] Tiến trình kịch bản Hoàn thành 20%
+  - button "Chuyển đến Bước 1": B1
+  - button "Chuyển đến Bước 2": B2
+  - button "Chuyển đến Bước 3": B3
+  - button "Chuyển đến Bước 4": B4
+  - button "Chuyển đến Bước 5": B5
+  - button "Về đầu kịch bản":
+    - img
+  - button "Bước trước" [disabled]:
+    - img
+  - button "Chạy tự động"
+  - button "Bước tiếp theo":
+    - img
+  - text: "Đang xem: Bước 1 / 5"
+  - img
+  - button "0.5x"
+  - button "1x" [pressed]
+  - button "2x"

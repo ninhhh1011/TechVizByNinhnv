@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Sparkles,
   Trash2,
@@ -14,8 +14,9 @@ import {
   Footprints,
   Info,
 } from 'lucide-react';
-import { SimulationNode, SimulationStep } from '../types/simulation';
+import { SimulationNode, SimulationScenario, SimulationStep } from '../types/simulation';
 import { DEFAULT_GRID_CONFIG } from '../data/gridPresets';
+import { solveGrid, type PathResult } from '../utils/pathfinding';
 
 export interface GridPathRendererProps {
   nodes?: SimulationNode[];
@@ -24,25 +25,18 @@ export interface GridPathRendererProps {
   speed?: number;
   rows?: number;
   cols?: number;
-}
-
-interface PathResult {
-  visitedOrder: [number, number][];
-  visitedSet: Set<string>;
-  path: [number, number][];
-  pathSet: Set<string>;
-  costs: Map<string, number>;
-  found: boolean;
-  totalCost: number;
+  config?: SimulationScenario['defaultGridConfig'];
 }
 
 export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
   nodes,
   step,
   activeNodeIds,
-  rows = DEFAULT_GRID_CONFIG.rows,
-  cols = DEFAULT_GRID_CONFIG.cols,
+  config = DEFAULT_GRID_CONFIG,
+  rows = config.rows,
+  cols = config.cols,
 }) => {
+  const gridData = step.gridData ?? step.visualData;
   // 1. Resolve 4 Switch States from activeNodeIds (with multiple fallback keys)
   const useHeuristic =
     activeNodeIds.has('useHeuristic') ||
@@ -66,18 +60,18 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
 
   // 2. Start & Target coordinates
   const start = useMemo<[number, number]>(
-    () => step.gridData?.start || DEFAULT_GRID_CONFIG.start,
-    [step.gridData?.start]
+    () => gridData?.start || config.start,
+    [gridData?.start, config.start]
   );
   const end = useMemo<[number, number]>(
-    () => step.gridData?.end || DEFAULT_GRID_CONFIG.end,
-    [step.gridData?.end]
+    () => gridData?.end || config.end,
+    [gridData?.end, config.end]
   );
 
   // 3. Wall Management (allows real-time drawing & erasing)
   const [walls, setWalls] = useState<Set<string>>(() => {
     const initial = new Set<string>();
-    const presetWalls = DEFAULT_GRID_CONFIG.initialWalls || [];
+    const presetWalls = config.initialWalls || [];
     presetWalls.forEach(([r, c]) => initial.add(`${r},${c}`));
     return initial;
   });
@@ -97,179 +91,42 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
   }, []);
 
-  // When step changes, if not in manual interactive drawing, sync to step's scenario
-  const prevStepRef = useRef<number>(step.stepIndex);
-  useEffect(() => {
-    if (prevStepRef.current !== step.stepIndex) {
-      prevStepRef.current = step.stepIndex;
-      // When user uses playback buttons, keep preset walls synced
-      if (!isInteractiveMode) {
-        const initial = new Set<string>();
-        const presetWalls = DEFAULT_GRID_CONFIG.initialWalls || [];
-        presetWalls.forEach(([r, c]) => initial.add(`${r},${c}`));
-        setWalls(initial);
-      }
-    }
-  }, [step.stepIndex, isInteractiveMode]);
-
-  // 4. Live A* / Dijkstra Solver Engine
-  const liveResult = useMemo<PathResult>(() => {
-    const [sr, sc] = start;
-    const [er, ec] = end;
-    const startKey = `${sr},${sc}`;
-    const endKey = `${er},${ec}`;
-
-    const gScore = new Map<string, number>();
-    const fScore = new Map<string, number>();
-    const cameFrom = new Map<string, [number, number]>();
-    const visitedOrder: [number, number][] = [];
-    const visitedSet = new Set<string>();
-
-    const h = (r: number, c: number): number => {
-      if (!useHeuristic) return 0;
-      const dx = Math.abs(r - er);
-      const dy = Math.abs(c - ec);
-      if (allowDiagonal) {
-        // Octile distance for 8-direction movement
-        return Math.max(dx, dy) + (Math.SQRT2 - 1) * Math.min(dx, dy);
-      }
-      // Manhattan distance for 4-direction movement
-      return dx + dy;
-    };
-
-    gScore.set(startKey, 0);
-    fScore.set(startKey, h(sr, sc));
-
-    const openSet: string[] = [startKey];
-    const closedSet = new Set<string>();
-
-    // Movement vectors: 4-way or 8-way
-    const dirs: [number, number, number][] = allowDiagonal
-      ? [
-          [-1, 0, 1],
-          [1, 0, 1],
-          [0, -1, 1],
-          [0, 1, 1],
-          [-1, -1, Math.SQRT2],
-          [-1, 1, Math.SQRT2],
-          [1, -1, Math.SQRT2],
-          [1, 1, Math.SQRT2],
-        ]
-      : [
-          [-1, 0, 1],
-          [1, 0, 1],
-          [0, -1, 1],
-          [0, 1, 1],
-        ];
-
-    let found = false;
-
-    while (openSet.length > 0) {
-      // Find node in openSet with minimum fScore
-      let bestIdx = 0;
-      let bestF = fScore.get(openSet[0]) ?? Infinity;
-      for (let i = 1; i < openSet.length; i++) {
-        const f = fScore.get(openSet[i]) ?? Infinity;
-        if (f < bestF) {
-          bestF = f;
-          bestIdx = i;
-        }
-      }
-
-      const currentKey = openSet.splice(bestIdx, 1)[0];
-      closedSet.add(currentKey);
-      const [cr, cc] = currentKey.split(',').map(Number);
-      visitedOrder.push([cr, cc]);
-      visitedSet.add(currentKey);
-
-      if (currentKey === endKey) {
-        found = true;
-        break;
-      }
-
-      const curG = gScore.get(currentKey) ?? Infinity;
-
-      for (const [dr, dc, moveCost] of dirs) {
-        const nr = cr + dr;
-        const nc = cc + dc;
-
-        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-        const nKey = `${nr},${nc}`;
-        if (walls.has(nKey) || closedSet.has(nKey)) continue;
-
-        const tentativeG = curG + moveCost;
-        const prevG = gScore.get(nKey) ?? Infinity;
-
-        if (tentativeG < prevG) {
-          cameFrom.set(nKey, [cr, cc]);
-          gScore.set(nKey, tentativeG);
-          const f = tentativeG + h(nr, nc);
-          fScore.set(nKey, f);
-
-          if (!openSet.includes(nKey)) {
-            openSet.push(nKey);
-          }
-        }
-      }
-    }
-
-    // Backtracking
-    const path: [number, number][] = [];
-    const pathSet = new Set<string>();
-
-    if (found) {
-      let curr: [number, number] | undefined = [er, ec];
-      while (curr) {
-        path.unshift(curr);
-        pathSet.add(`${curr[0]},${curr[1]}`);
-        if (curr[0] === sr && curr[1] === sc) break;
-        curr = cameFrom.get(`${curr[0]},${curr[1]}`);
-      }
-    }
-
-    return {
-      visitedOrder,
-      visitedSet,
-      path,
-      pathSet,
-      costs: useHeuristic ? fScore : gScore,
-      found,
-      totalCost: found ? gScore.get(endKey) ?? 0 : 0,
-    };
-  }, [start, end, walls, useHeuristic, allowDiagonal, rows, cols]);
-
+  const liveResult = useMemo(() => solveGrid({ rows, cols, start, end }, walls, useHeuristic, allowDiagonal),
+    [rows, cols, start, end, walls, useHeuristic, allowDiagonal]);
   // Determine active display data: Step snapshot or Live Solver
-  const displayResult = useMemo(() => {
+  const displayResult = useMemo<PathResult>(() => {
     // If user drew walls or chose interactive mode, use live solver
     if (isInteractiveMode) {
       return liveResult;
     }
 
-    // Otherwise in Step Playback mode:
-    if (step.stepIndex === 4) {
-      return liveResult;
-    }
-
-    // For Steps 1, 2, 3: use step.gridData snapshot if present
-    if (step.gridData?.visited && step.gridData.visited.length > 0) {
+    // A curated frame is the playback source; the solver is for user-edited walls.
+    if (gridData) {
       const vSet = new Set<string>();
-      step.gridData.visited.forEach(([r, c]) => vSet.add(`${r},${c}`));
+      (gridData.visited || []).forEach(([r, c]) => vSet.add(`${r},${c}`));
       const pSet = new Set<string>();
-      (step.gridData.path || []).forEach(([r, c]) => pSet.add(`${r},${c}`));
+      const path = gridData.path || [];
+      path.forEach(([r, c]) => pSet.add(`${r},${c}`));
+
+      const lastCell = path.length ? path[path.length - 1] : null;
+      const reachedEnd = !!lastCell && lastCell[0] === end[0] && lastCell[1] === end[1];
+      const isExhausted = gridData.result === 'no-path';
+      const reason = isExhausted ? 'Đã duyệt hết vùng có thể đi, không có đường tới đích.' : undefined;
 
       return {
-        visitedOrder: step.gridData.visited,
+        visitedOrder: gridData.visited || [],
         visitedSet: vSet,
-        path: step.gridData.path || [],
+        path,
         pathSet: pSet,
-        costs: liveResult.costs,
-        found: (step.gridData.path || []).length > 0,
-        totalCost: (step.gridData.path || []).length,
+        costs: new Map<string, number>(),
+        found: reachedEnd,
+        totalCost: path.slice(1).reduce((cost, [r, c], i) => cost + (r !== path[i][0] && c !== path[i][1] ? Math.SQRT2 : 1), 0),
+        reason,
       };
     }
 
-    return liveResult;
-  }, [isInteractiveMode, step.stepIndex, step.gridData, liveResult]);
+    return { visitedOrder: [], visitedSet: new Set(), path: [], pathSet: new Set(), costs: new Map(), found: false, totalCost: 0, reason: 'Chưa có dữ liệu lưới cho bước này.' };
+  }, [isInteractiveMode, gridData, liveResult]);
 
   // 5. Mouse Interaction Handlers for Wall Drawing
   const toggleCell = useCallback(
@@ -348,10 +205,10 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
   const handleResetToPreset = useCallback(() => {
     setIsInteractiveMode(false);
     const initial = new Set<string>();
-    const presetWalls = DEFAULT_GRID_CONFIG.initialWalls || [];
+    const presetWalls = config.initialWalls || [];
     presetWalls.forEach(([r, c]) => initial.add(`${r},${c}`));
     setWalls(initial);
-  }, []);
+  }, [config]);
 
   return (
     <div className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between select-none font-['Plus_Jakarta_Sans',sans-serif]">
@@ -391,13 +248,13 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
 
             <span
               className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full transition-colors ${
-                showWeights
+                showWeights && displayResult.costs.size > 0
                   ? 'bg-amber-50 text-amber-800 border border-amber-200'
                   : 'bg-gray-100 text-gray-400 border border-gray-200'
               }`}
             >
               <Hash className="w-3 h-3" />
-              {showWeights ? 'Trọng số f(n): BẬT' : 'Trọng số: TẮT'}
+              {showWeights ? displayResult.costs.size > 0 ? 'Trọng số f(n): BẬT' : 'Chưa có dữ liệu trọng số' : 'Trọng số: TẮT'}
             </span>
 
             <span
@@ -469,7 +326,7 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
               const isStart = r === start[0] && c === start[1];
               const isEnd = r === end[0] && c === end[1];
               const isWall = walls.has(key);
-              const isPath = autoTracePath && displayResult.pathSet.has(key);
+              const isPath = (isInteractiveMode ? autoTracePath : true) && displayResult.pathSet.has(key);
               const isVisited = displayResult.visitedSet.has(key);
               const costVal = displayResult.costs.get(key);
 
@@ -495,8 +352,11 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
               }
 
               return (
-                <div
+                <button
+                  type="button"
                   key={key}
+                  aria-label={`Ô [${r}, ${c}]${isStart ? ', xuất phát' : isEnd ? ', đích' : isWall ? ', tường' : isPath ? ', đường đi' : isVisited ? ', đã duyệt' : ', trống'}`}
+                  onClick={(event) => { if (event.detail === 0) toggleCell(r, c, walls.has(key) ? 'remove' : 'add'); }}
                   onMouseDown={(e) => handleMouseDown(r, c, e)}
                   onMouseEnter={() => handleMouseEnter(r, c)}
                   className={`w-7 h-7 sm:w-8 sm:h-8 rounded-[5px] border flex items-center justify-center cursor-pointer transition-all duration-100 ${cellClass}`}
@@ -517,7 +377,7 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
                       {Math.round(costVal)}
                     </span>
                   ) : null}
-                </div>
+                </button>
               );
             })
           )}
@@ -531,13 +391,11 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
           <div className="flex items-center gap-1.5">
             <Footprints className="w-4 h-4 text-[#E31B23]" />
             <span>
-              Quãng đường tối ưu:{' '}
+              Độ dài đường đi:{' '}
               <strong className="text-[#1A1A1A] font-mono text-sm">
-                {displayResult.found
-                  ? allowDiagonal
-                    ? displayResult.totalCost.toFixed(1)
-                    : `${displayResult.path.length} bước`
-                  : 'Không có đường'}
+                {displayResult.path.length > 0
+                  ? `${Math.max(0, displayResult.path.length - 1)} bước${allowDiagonal ? ` (chi phí ${displayResult.totalCost.toFixed(1)})` : ''}`
+                  : displayResult.reason || (isInteractiveMode ? 'Không có đường' : 'Chưa có đường trong bước này')}
               </strong>
             </span>
           </div>
@@ -564,7 +422,7 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
             ) : (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">
                 <AlertCircle className="w-3 h-3 text-[#E31B23]" />
-                Tường chắn chặn kín đích
+                {displayResult.reason || (isInteractiveMode ? 'Đã duyệt hết vùng có thể đi, không có đường tới đích.' : 'Bước này chưa kết luận tìm được đường hay không.')}
               </span>
             )}
           </div>
@@ -592,7 +450,7 @@ export const GridPathRenderer: React.FC<GridPathRendererProps> = ({
       </div>
 
       {/* Helpful Hint Footnote */}
-      <div className="relative z-10 mt-2 flex items-center justify-between text-[11px] text-gray-400">
+      <div className="relative z-10 mt-2 flex flex-wrap gap-1 items-center justify-between text-[11px] text-gray-400">
         <span className="flex items-center gap-1">
           <Info className="w-3 h-3 text-gray-400" />
           Nhấn giữ chuột kéo trên lưới để vẽ hoặc xóa tường chắn. Thuật toán sẽ tự động tính lại đường đi ngay tức thì!

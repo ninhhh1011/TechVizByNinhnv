@@ -6,7 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test \"src/**/*.test.mjs\" \"functions/**/*.test.mjs\"",
+    "check:fixtures": "node docs/plans/phase1/check.mjs && node docs/plans/phase2/check.mjs",
+    "check:ai": "node docs/plans/phase5/evaluate.mjs",
+    "test:playback": "node docs/plans/phase4/check.mjs",
+    "test:capabilities": "node docs/plans/phase5/check.mjs",
+    "test:e2e": "npm run build && node docs/plans/phase6/run.mjs",
+    "smoke:baseline": "node docs/plans/baseline/smoke.mjs"
   },
   "dependencies": {
     "@heroui/react": "^2.8.10",
@@ -20,6 +27,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.6.1",
+    "playwright": "^1.64.1",
     "postcss": "^8.5.31",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.7.3",

@@ -1,75 +1,68 @@
-# TechViz Sandbox Encyclopedia 🚀
+# TechViz Sandbox
 
-Bách khoa toàn thư tương tác trực quan hóa thuật toán, cấu trúc dữ liệu và kiến trúc hệ thống phân tán, chuẩn cơ sở học thuật (CLRS & DDIA) kết hợp phong cách thiết kế Fintech Techcombank Red-White.
+Trực quan hóa thuật toán và luồng hệ thống bằng React, TypeScript, Vite và năm renderer DOM/SVG. Kế hoạch và bằng chứng nằm trong [Master Plan](docs/plans/MASTER_PLAN.md) và [Progress](docs/plans/PROGRESS.md).
 
-![TechViz Sandbox](https://img.shields.io/badge/TechViz-v2.0-E31B23?style=for-the-badge)
-![React](https://img.shields.io/badge/React-18.3.1-blue?style=for-the-badge&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-3178C6?style=for-the-badge&logo=typescript)
-![Vite](https://img.shields.io/badge/Vite-6.4.4-646CFF?style=for-the-badge&logo=vite)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.19-38B2AC?style=for-the-badge&logo=tailwind-css)
+Ứng dụng phân biệt nguồn dữ liệu:
 
----
+- 11 preset giữ nguyên snapshots, được ghi nhãn **minh họa biên soạn**, chưa xác minh toàn bộ claim.
+- Nhập `Bubble pass [3,1,2]` để chạy một lượt Bubble Sort với 2–20 số. Runner và validator kiểm compare/swap, bảo toàn giá trị và max về cuối; không khẳng định toàn mảng đã sort.
+- Chủ đề AI chưa có capability được duyệt trả unsupported/error và giữ kịch bản đang xem. JSON hợp lệ không tự được coi là mô phỏng đúng.
 
-## 🌟 Điểm nổi bật (Key Features)
+```mermaid
+flowchart LR
+  Q[Chủ đề] --> C[Catalog]
+  C --> P[Preset minh họa]
+  C --> R[Reference runner + validator]
+  C --> AI[Proxy AI server]
+  AI --> U[Unsupported hoặc error]
+  P --> S[Snapshots]
+  R --> S
+  S --> B[Playback tại frame boundary]
+  B --> V[5 renderer DOM/SVG]
+```
 
-1. **5 Visualization Engines Chuyên biệt**:
-   - `array-pointer`: Trực quan hóa mảng 1D, hai con trỏ, so sánh độ cao cột và âm thanh tần số Web Audio bíp (QuickSort Lomuto, Binary Search, BubbleSort).
-   - `grid-path`: Không gian lưới 2D tìm đường tối ưu A* / Dijkstra, kéo thả chuột vẽ vật cản thời gian thực.
-   - `flow-graph`: Kiến trúc hệ thống phân tán đa tầng, gói tin bay theo quỹ đạo SVG với mô phỏng chuyển giao trạng thái (Kafka, Redis, RAG, Load Balancer, Token Bucket).
-   - `swarm-2d`: Không gian bầy đàn 2D mô phỏng PSO (Particle Swarm Optimization) và giải thuật di truyền GA tìm cực trị toàn cục $gBest$.
-   - `tree-graph`: Cây đệ quy phân nhánh chia để trị (MergeSort Recursion Tree), cây nhị phân tìm kiếm BST.
+## Chạy local
 
-2. **Khu vực Sư phạm Chuẩn Khoa học Máy tính**:
-   - **Academic Concept Overview**: Bản chất & mô hình trực quan (Mental Model), cơ sở lý thuyết & độ phức tạp Big-O, và ứng dụng thực tiễn trong công nghiệp.
-   - **Step Deep-Dive Inspector**: Diễn giải nguyên nhân của từng bước, mã giả thực thi (`logicCode`), và bảng biến số thời gian thực (`stateVariables`).
+Đã kiểm với Node.js 24.15.0. Bộ test trực tiếp import TypeScript bằng Node.
 
-3. **Groq AI Pipeline Thông minh**:
-   - Nhập bất kỳ thuật toán hoặc công nghệ nào, Groq LLM (Llama 3.3 70B, GPT-OSS) tự động phân loại engine phù hợp và tạo kịch bản 5-8 bước chân thực.
-   - Cơ chế Fallback an toàn và Sanitizer phòng thủ chống lỗi runtime.
-
-4. **Điều khiển & Tương tác Thân thiện**:
-   - Playback Dock: Chạy tự động (Auto-play), tua bước, điều chỉnh tốc độ (0.5x, 1x, 2x).
-   - Phím tắt bàn phím: `ArrowLeft` (Lùi bước), `ArrowRight` (Tiến bước).
-
----
-
-## 🛠️ Cài đặt & Chạy ứng dụng
-
-```bash
-# Cài đặt dependencies
-npm install
-
-# Khởi chạy server phát triển (Development)
+```sh
+npm ci
 npm run dev
-
-# Đóng gói sản phẩm (Production Build)
 npm run build
+npm run preview -- --host 127.0.0.1 --port 3000
 ```
 
----
+Vite dev/preview phục vụ frontend. Pages Function cần Cloudflare runtime; preset và runner local hoạt động mà không cần AI key.
 
-## 📁 Cấu trúc Thư mục
+Playback có Next/Back/Seek/Reset, speed và phím ArrowLeft/ArrowRight khi không nhập văn bản. Pause hiển thị snapshot tại frame boundary; reduced motion tắt chuyển động. Timeline dài cuộn riêng. Grid dùng snapshot trong playback; chỉnh tường chuyển sang solver tương tác, seek/reset quay về snapshot.
 
-```
-src/
-├── components/          # 5 Visualization Engines, Banner Sư phạm, Playback Dock, Header
-│   ├── ArrayPointerRenderer.tsx
-│   ├── FlowGraphRenderer.tsx
-│   ├── GridPathRenderer.tsx
-│   ├── Swarm2DRenderer.tsx
-│   ├── TreeGraphRenderer.tsx
-│   ├── StorytellerBanner.tsx
-│   ├── PlaybackDock.tsx
-│   ├── HeroHeader.tsx
-│   └── ApiKeyModal.tsx
-├── data/                # 11 kịch bản mẫu phong phú (Kafka, Redis, RAG, QuickSort, PSO, MergeSort...)
-├── services/            # Groq AI Service, API Key manager, Model Fallback
-├── types/               # Type definitions (SimulationScenario, SimulationStep, Engines...)
-└── utils/               # Web Audio API tone generator
+## Kiểm thử
+
+```sh
+npm test
+npm run check:fixtures
+npm run check:ai
+npm run test:e2e
 ```
 
----
+`test:e2e` build, mở preview riêng rồi chạy regression 11 preset, AI negatives, fake playback clock, capability, keyboard/mobile/reduced motion và ma trận Chromium/Firefox/WebKit. Cài các browser Playwright nếu máy chưa có:
 
-## 📜 Giấy phép & Tác quyền
+```sh
+npx playwright install chromium firefox webkit
+```
 
-Phát triển bởi **ninhnv** &bull; TechViz Sandbox Encyclopedia.
+Artifact mới lưu ở `docs/plans/phase6/`; không ghi đè baseline P0. Benchmark so production với Git `991ea6c` bằng `node docs/plans/phase4/measure.mjs`. Số đo seek không đại diện animation FPS hay mọi scene dày.
+
+## Cloudflare Pages và AI
+
+Frontend build command `npm run build`, output `dist`; backend là `functions/api/groq.ts`. Secret duy nhất cho provider là **GROQ_API_KEY ở server**. Không đặt khóa trong biến `VITE_*`, source hoặc bundle.
+
+Browser gửi `{query}`; server sở hữu prompt/model, token budget, giới hạn body và timeout. Limiter trong code chỉ áp dụng từng isolate; cần rate rule tại edge trước public AI rollout. Cấu hình `vercel.json` hiện tại chỉ là SPA và không triển khai Cloudflare Pages Function.
+
+Staging được cung cấp: [techvizbyninhnv.pages.dev](https://techvizbyninhnv.pages.dev/). Kiểm ngày 2026-10-22 cho thấy release cũ, CORS wildcard và một chuỗi khớp định dạng Groq key trong JavaScript công khai. **Cần thu hồi/rotate khóa cũ tại Groq, bỏ biến VITE chứa khóa và deploy bản đã kiểm.** [Báo cáo](docs/plans/phase5/staging-results.json) không lưu khóa. Redeploy không tự thu hồi khóa đã lộ.
+
+`node docs/plans/phase5/staging.mjs` kiểm page/assets/OPTIONS, không gọi provider. Sau release mới cần kiểm request/timeout/rate rule trong staging thật rồi mới đóng G2.
+
+## Nghiệm thu còn cần kết quả thực
+
+Code và kiểm thử tự động không thay thế human review nội dung, thử screen reader thực tế, pilot 5 người học, contributor trial hoặc diễn tập rollback vận hành. Phiếu review, hướng dẫn pilot và playbook đã có trong `docs/plans/phase5/`, `phase6/`, `phase7/`; trạng thái thực theo Progress.

@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+.simulation-stage[data-playing="false"] *,
+.simulation-stage[data-playing="false"] *::before,
+.simulation-stage[data-playing="false"] *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer utilities {
   .header-gradient {
     background: linear-gradient(180deg, #B80D14 0%, #E31B23 55%, #F5F6F8 100%);

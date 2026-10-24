@@ -1,0 +1,214 @@
+{
+  "baseUrl": "http://127.0.0.1:57927/",
+  "browser": "Playwright Chromium headless",
+  "results": [
+    {
+      "device": "desktop",
+      "family": "flow-graph",
+      "preset": "Kafka",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 384,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "desktop",
+      "family": "array-pointer",
+      "preset": "QuickSort",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 366,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "desktop",
+      "family": "grid-path",
+      "preset": "A* / Dijkstra",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 626,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "desktop",
+      "family": "swarm-2d",
+      "preset": "PSO / Swarm 2D",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over50ms": 0
+      },
+      "domNodes": 365,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "desktop",
+      "family": "tree-graph",
+      "preset": "MergeSort (Tree)",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 312,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "mobile",
+      "family": "flow-graph",
+      "preset": "Kafka",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 384,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "mobile",
+      "family": "array-pointer",
+      "preset": "QuickSort",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 366,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "mobile",
+      "family": "grid-path",
+      "preset": "A* / Dijkstra",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 714,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "mobile",
+      "family": "swarm-2d",
+      "preset": "PSO / Swarm 2D",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 365,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "mobile",
+      "family": "tree-graph",
+      "preset": "MergeSort (Tree)",
+      "checks": [
+        "renderer",
+        "next/previous/seek/reset",
+        "autoplay/pause/speed",
+        "zoom/pan/reset-view"
+      ],
+      "errors": [],
+      "frameMs": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over50ms": 0
+      },
+      "domNodes": 312,
+      "horizontalOverflowPx": 0,
+      "status": "pass"
+    },
+    {
+      "device": "desktop",
+      "family": "ai-error",
+      "checks": [
+        "mocked-503-error-card"
+      ],
+      "status": "pass"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "baseline": "991ea6c",
+  "browser": "156.0.8078.4",
+  "comparison": "Stage DOM including text, classes, SVG paths, packet count/labels and inline left/top/size. CSS motion disabled; transient Framer opacity/translation/scale excluded. Vector rotation and canvas transform retained. This compares semantic frame/layout, not animation phase or pixels. Banner/header excluded because copy intentionally changed.",
+  "rows": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "apache-kafka",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "redis-cache",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "rag-pipeline",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "quick-sort",
+      "steps": 10,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "binary-search",
+      "steps": 7,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "merge-sort",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "bubble-sort",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "astar-dijkstra-grid",
+      "steps": 4,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "genetic-algorithm-ga",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "load-balancer",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "preset": "token-bucket",
+      "steps": 4,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "apache-kafka",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "redis-cache",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "rag-pipeline",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "quick-sort",
+      "steps": 10,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "binary-search",
+      "steps": 7,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "merge-sort",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "bubble-sort",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "astar-dijkstra-grid",
+      "steps": 4,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "genetic-algorithm-ga",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "load-balancer",
+      "steps": 5,
+      "verdict": "pass"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "preset": "token-bucket",
+      "steps": 4,
+      "verdict": "pass"
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+[
+  {
+    "id": "apache-kafka",
+    "title": "Apache Kafka",
+    "rendererType": "flow-graph",
+    "steps": 5,
+    "stepTitles": [
+      "Phát sinh thông điệp (Publish Message)",
+      "Cân bằng tải Consumer Group song song",
+      "Giả lập sự cố Node (Consumer B Offline)",
+      "Tái cân bằng tự động (Dynamic Rebalance)",
+      "Đồng bộ & Lưu vị trí (Commit Offset)"
+    ],
+    "stepExplanations": [
+      "Producer Service đóng gói luồng giao dịch tài chính liên tục và gửi vào Kafka Topic được chia làm 2 Partition (P0 & P1) để xử lý song song.",
+      "Kafka Broker phân phối Partition P0 cho Consumer Worker A và Partition P1 cho Consumer Worker B. Cả 2 worker kéo dữ liệu (Pull model) độc lập với thông lượng tối đa.",
+      "Thử gạt tắt Consumer Worker B ở cột bên trái! Khi Consumer B mất tín hiệu Heartbeat quá session timeout, Coordinator phát hiện Node sập và lập tức khóa partition.",
+      "Quy trình Rebalance hoàn tất: Kafka Broker chuyển quyền sở hữu toàn bộ Partition (P0 + P1) sang Consumer Worker A còn hoạt động. Không có giao dịch nào bị thất thoát!",
+      "Consumer Worker A xử lý thông suốt toàn bộ luồng thông điệp từ cả 2 Partition, tiến hành Commit Offset lên Kafka Broker định kỳ để ghi nhớ vị trí xử lý an toàn."
+    ],
+    "packetLabels": [
+      [
+        "Batch Txn [P0, P1]"
+      ],
+      [
+        "Fetch P0 Events",
+        "Fetch P1 Events"
+      ],
+      [
+        "Heartbeat Ping (Failed)"
+      ],
+      [
+        "Reassign P0 + P1"
+      ],
+      [
+        "Commit Offset [P0:1090, P1:2060]"
+      ]
+    ],
+    "sha256": "91dcbfade6ed9f7863c20159360a0be15bc4384c8ca0bb8050e1f8d7eba5bf56"
+  },
+  {
+    "id": "redis-cache",
+    "title": "Redis Cache-Aside",
+    "rendererType": "flow-graph",
+    "steps": 5,
+    "stepTitles": [
+      "Yêu cầu đọc dữ liệu gửi đến API Gateway",
+      "Kiểm tra Cache: Cache Miss (Key chưa có)",
+      "Truy vấn CSDL gốc và Nạp ngược Cache (Warm-up)",
+      "Lượt truy vấn tiếp theo: Cache Hit tuyệt đối",
+      "Cập nhật dữ liệu & Hủy Cache (Cache Invalidation)"
+    ],
+    "stepExplanations": [
+      "Khách hàng mở app ngân hàng để kiểm tra số dư và thông tin tài khoản. Request RESTful được gửi đến Core API Gateway.",
+      "API Gateway gửi lệnh GET key \"acc:19008888\" vào Redis. Do chưa có trong RAM hoặc đã hết hạn (TTL Expired), Redis trả về kết quả rỗng (NIL - Cache Miss).",
+      "API Gateway buộc phải truy vấn xuống PostgreSQL để lấy dữ liệu gốc (mất ~35ms), sau đó lập tức nạp bản ghi này vào Redis với TTL=300 giây.",
+      "Khách hàng tiếp theo yêu cầu dữ liệu. API Gateway lấy ngay lập tức từ Redis RAM trong 0.8ms (Cache Hit). PostgreSQL hoàn toàn không bị đánh thức!",
+      "Khi có giao dịch nạp tiền mới, API Gateway cập nhật trực tiếp vào PostgreSQL và đồng thời xóa/hủy khóa trong Redis (DEL acc:19008888) để tránh dữ liệu bị cũ (stale data)."
+    ],
+    "packetLabels": [
+      [
+        "GET /api/v1/account/19008888"
+      ],
+      [
+        "GET acc:19008888 (Miss)"
+      ],
+      [
+        "SELECT * FROM accounts WHERE id=...",
+        "SETEX acc:19008888 300 {data}"
+      ],
+      [
+        "GET acc:19008888 (HIT)",
+        "HTTP 200 OK (Latency: 1.2ms)"
+      ],
+      [
+        "UPDATE accounts SET balance=...",
+        "DEL acc:19008888 (Evict)"
+      ]
+    ],
+    "sha256": "fb835745990811dbc1abe7768cecbb2d4f766f4cd7af3b829d51dff62ae2c753"
+  },
+  {
+    "id": "rag-pipeline",
+    "title": "RAG Pipeline",
+    "rendererType": "flow-graph",
+    "steps": 5,
+    "stepTitles": [
+      "Người dùng gửi câu hỏi nghiệp vụ tài chính",
+      "Vector hóa câu hỏi đa chiều (Dense Vector)",
+      "Truy xuất Top-K ngữ cảnh chính xác từ Milvus",
+      "Tăng cường Prompt & LLM sinh câu trả lời",
+      "Hiển thị kết quả & Trích dẫn nguồn (Attribution)"
+    ],
+    "stepExplanations": [
+      "Khách hàng hỏi: \"Điều kiện tham gia Tài khoản Sinh Lời Tự Động của Techcombank là gì?\". Câu hỏi được chuyển đến Embedding Engine.",
+      "Embedding Model biến đổi câu hỏi thành Vector toán học 1536 chiều [0.021, -0.158, ...], nắm bắt trọn vẹn ý định ngữ nghĩa thay vì chỉ từ khóa khớp chữ thô.",
+      "Vector DB thực hiện Cosine Similarity Search trên hàng triệu trang quy chế nội bộ, trích xuất chính xác 3 đoạn văn bản (Chunks) về điều kiện tài khoản sinh lời.",
+      "LLM nhận Prompt kết hợp: [Ngữ cảnh chính xác từ Techcombank] + [Câu hỏi của khách]. LLM tổng hợp câu trả lời 100% chuẩn xác, hoàn toàn tránh ảo giác!",
+      "Ứng dụng ngân hàng số hiển thị câu trả lời hoàn chỉnh kèm thẻ nguồn tài liệu chính thức của Techcombank, người dùng có thể nhấp vào để kiểm chứng tính xác thực."
+    ],
+    "packetLabels": [
+      [
+        "Natural Language Query"
+      ],
+      [
+        "Query Vector (1536 dims)"
+      ],
+      [
+        "Top-3 Relevant Chunks"
+      ],
+      [
+        "Grounded Answer + Citations"
+      ],
+      [
+        "Display with Source Badges"
+      ]
+    ],
+    "sha256": "b8a2d3df3fe57c123546194a5d17f0e9271dad961fa13d39e9a75f453d43f814"
+  },
+  {
+    "id": "quick-sort",
+    "title": "QuickSort (Phân hoạch Lomuto & Đổi chỗ)",
+    "rendererType": "array-pointer",
+    "steps": 10,
+    "stepTitles": [
+      "Khởi tạo phân hoạch (Chọn Pivot)",
+      "So sánh arr[0] (48) với Pivot (35)",
+      "So sánh arr[1] (15) với Pivot (35) -> Phát hiện phần tử nhỏ hơn",
+      "Hoán đổi (Swap) arr[0] và arr[1] để dồn số nhỏ về trước",
+      "So sánh arr[2] (76) với Pivot (35)",
+      "So sánh arr[3] (23) với Pivot (35) -> Tìm thấy 23 <= 35",
+      "Hoán đổi arr[1] (48) và arr[3] (23)",
+      "Duyệt các phần tử còn lại (89 và 60)",
+      "Đưa Pivot về vị trí chính xác (Hoán đổi arr[i+1] và arr[pivot])",
+      "Hoàn tất phân hoạch & Toàn bộ mảng đã sắp xếp"
+    ],
+    "stepExplanations": [
+      "Chọn phần tử cuối cùng làm Pivot (arr[6] = 35, màu đỏ Techcombank). Con trỏ j bắt đầu duyệt từ chỉ số 0 để tìm các phần tử nhỏ hơn hoặc bằng Pivot.",
+      "Con trỏ j = 0. So sánh 48 với Pivot 35: Vì 48 > 35, phần tử này thuộc về nửa bên phải Pivot. Con trỏ i giữ nguyên ngoài mảng, j tiếp tục tiến.",
+      "Con trỏ j = 1. So sánh 15 với Pivot 35: Vì 15 <= 35, tăng con trỏ i lên vị trí 0. Chuẩn bị hoán đổi arr[i=0] (48) và arr[j=1] (15).",
+      "Hoán đổi giá trị 48 và 15! Phần tử 15 nhỏ hơn Pivot được đưa vào vùng an toàn bên trái.",
+      "Con trỏ j tăng lên 2. So sánh arr[2] = 76 với Pivot 35: Vì 76 > 35, bỏ qua và không tăng i.",
+      "Con trỏ j tăng lên 3. So sánh 23 với 35: 23 <= 35 thỏa mãn điều kiện! Tăng con trỏ i lên 1. Chuẩn bị hoán đổi arr[i=1] (48) với arr[j=3] (23).",
+      "Hoán đổi 48 và 23! Vùng bên trái giờ đây chứa [15, 23] đều nhỏ hơn Pivot 35.",
+      "Con trỏ j lần lượt duyệt qua arr[4] = 89 và arr[5] = 60. Cả hai đều lớn hơn 35. Con trỏ i dừng lại cố định ở chỉ số 1.",
+      "Hoán đổi arr[2] (76) với Pivot arr[6] (35)! Số 35 được đưa vào đúng vị trí chỉ số 2: bên trái toàn số nhỏ hơn, bên phải toàn số lớn hơn.",
+      "Thuật toán QuickSort đệ quy trên hai nửa mảng con. Toàn bộ mảng [15, 23, 35, 48, 60, 76, 89] đã được sắp xếp tăng dần hoàn chỉnh (màu xanh ngọc lục bảo)."
+    ],
+    "packetLabels": [
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "sha256": "930a0c1575ed24d3f169d18ce84b6463e32c11b8780aff2e7116f6bcfe274c59"
+  },
+  {
+    "id": "binary-search",
+    "title": "Binary Search (Tìm kiếm nhị phân & Hai con trỏ)",
+    "rendererType": "array-pointer",
+    "steps": 7,
+    "stepTitles": [
+      "Khởi tạo không gian tìm kiếm (Target = 67)",
+      "Tính điểm giữa mid lần 1 (mid = 3, arr[3] = 49)",
+      "Thu hẹp không gian tìm kiếm: arr[mid] < Target (49 < 67)",
+      "Tính điểm giữa mid lần 2 (mid = 5, arr[5] = 76)",
+      "Thu hẹp không gian tìm kiếm: arr[mid] > Target (76 > 67)",
+      "Hội tụ con trỏ: mid = 4, arr[4] === Target (67 === 67)",
+      "Hoàn tất tìm kiếm nhị phân & Chốt vị trí"
+    ],
+    "stepExplanations": [
+      "Mảng đã được sắp xếp gồm 8 phần tử: [14, 25, 38, 49, 67, 76, 88, 95]. Đặt con trỏ left = 0, right = 7. Mục tiêu cần tìm kiếm là Target = 67.",
+      "Tính chỉ số giữa: mid = Math.floor((0 + 7) / 2) = 3. Giá trị phần tử tại mid là arr[3] = 49. So sánh 49 với Target = 67.",
+      "Vì 49 < 67, phần tử mục tiêu chắc chắn nằm bên phải mid! Ta loại bỏ toàn bộ nửa trái [0..3], cập nhật left = mid + 1 = 4.",
+      "Không gian tìm kiếm mới là [4..7]. Tính mid = Math.floor((4 + 7) / 2) = 5. Giá trị arr[5] = 76. So sánh 76 với Target = 67.",
+      "Vì 76 > 67, phần tử mục tiêu nằm bên trái mid! Cập nhật right = mid - 1 = 4. Không gian tìm kiếm lúc này chỉ còn 1 phần tử tại chỉ mục 4.",
+      "Hai con trỏ hội tụ: left = right = 4 -> mid = 4. Giá trị arr[4] = 67 khớp chính xác với Target 67! Tìm kiếm thành công.",
+      "Phần tử 67 đã được tìm thấy tại chỉ mục [4] chỉ sau 3 lần so sánh! Độ phức tạp O(log N) đem lại hiệu năng vượt trội so với tìm kiếm tuyến tính O(N)."
+    ],
+    "packetLabels": [
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "sha256": "8dd7e656840616540591a33a6153692985d9b6d01e1c60dbb34c6e8f8efe9f26"
+  },
+  {
+    "id": "merge-sort",
+    "title": "MergeSort (Cây Đệ quy Chia để Trị)",
+    "rendererType": "tree-graph",
+    "steps": 5,
+    "stepTitles": [
+      "Khởi tạo Mảng gốc (Root Node Level 0)",
+      "Phân rã Tầng 1: Chia đôi thành 2 Nửa độc lập",
+      "Phân rã Tầng 2: Chia thành các cặp 2 phần tử",
+      "Hòa trộn Cặp Lá (Conquer & Merge Leaves)",
+      "Hòa trộn Hoàn tất về Gốc (Final Merge at Root)"
+    ],
+    "stepExplanations": [
+      "Mảng ban đầu [38, 27, 43, 3, 9, 82, 10, 19] tại gốc đệ quy. Thuật toán chuẩn bị chia đôi tại chỉ số giữa mid = 3 thành 2 bài toán con.",
+      "Mảng gốc được tách thành 2 mảng con cấp 1: Nửa trái [38, 27, 43, 3] và Nửa phải [9, 82, 10, 19]. Cả hai tiếp tục được xử lý đệ quy.",
+      "Tiếp tục chia đôi xuống tầng 2: sinh ra 4 mảng con [38, 27], [43, 3], [9, 82] và [10, 19]. Cấu trúc cây đệ quy mở rộng đều sang hai nhánh.",
+      "Các cặp mảng kích thước 2 được hòa trộn có thứ tự: [38, 27] &rarr; [27, 38]; [43, 3] &rarr; [3, 43]; [9, 82] &rarr; [9, 82]; [10, 19] &rarr; [10, 19].",
+      "Hai mảng con [3, 27, 38, 43] và [9, 10, 19, 82] được con trỏ hai đầu so sánh lần cuối, tạo thành mảng hoàn chỉnh có thứ tự tuyệt đối tại nút gốc."
+    ],
+    "packetLabels": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "sha256": "96ca33957343d93e530a264142c9b47fb8b88f49c3f4772a40204f44f2f7468a"
+  },
+  {
+    "id": "bubble-sort",
+    "title": "BubbleSort (Sắp xếp Nổi bọt)",
+    "rendererType": "array-pointer",
+    "steps": 5,
+    "stepTitles": [
+      "Khởi tạo mảng ban đầu",
+      "So sánh & Đổi chỗ arr[0]=64 với arr[1]=34",
+      "Đẩy phần tử lớn nhất 64 về cuối mảng",
+      "Lượt quét tiếp theo: Chốt số 34",
+      "Hoàn tất Sắp xếp Nổi bọt"
+    ],
+    "stepExplanations": [
+      "Mảng gồm 6 số nguyên chưa có thứ tự [64, 34, 25, 12, 22, 11]. Con trỏ i = 0 bắt đầu quét.",
+      "Vì 64 > 34, hai phần tử hoán đổi vị trí. Phần tử 64 bắt đầu nổi dần về phía sau.",
+      "Số 64 liên tục thắng các cặp so sánh tiếp theo và chốt vị trí tại chỉ số cuối cùng.",
+      "Lượt quét thứ hai đưa phần tử lớn nhì (34) về vị trí kề cuối arr[4].",
+      "Tất cả các phần tử đã nổi về đúng vị trí có thứ tự tăng dần [11, 12, 22, 25, 34, 64]."
+    ],
+    "packetLabels": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "sha256": "22f67af5e02bee1881372b4c55146088bd1fd834030b239070b8702f79fdd657"
+  },
+  {
+    "id": "astar-dijkstra-grid",
+    "title": "A* & Dijkstra Pathfinding (Duyệt sóng & Tìm đường tối ưu)",
+    "rendererType": "grid-path",
+    "steps": 4,
+    "stepTitles": [
+      "Bước 1: Khởi tạo Start (S) và Target (T)",
+      "Bước 2: Lan truyền tập mở (Open Set Expansion)",
+      "Bước 3: Gặp vật cản (Walls) & Bẻ hướng sóng qua khe hở",
+      "Bước 4: Chạm đích & Truy vết ngược đường đi ngắn nhất (Backtracking)"
+    ],
+    "stepExplanations": [
+      "Xác định tọa độ xuất phát Start (ô xanh lá [5, 2]) và điểm Đích Target (ô đỏ Techcombank [5, 19]). Thuật toán khởi tạo tập mở Open Set với nút Start, đặt g(S) = 0 và đánh giá khoảng cách Manhattan/Euclidean ban đầu h(S) đến đích.",
+      "Thuật toán liên tục lấy phần tử có hàm chi phí f(n) = g(n) + h(n) nhỏ nhất từ hàng đợi ưu tiên. Luồng sóng tìm kiếm lan tỏa sang các ô lân cận (4 hướng hoặc 8 hướng), liên tục cập nhật chi phí và mở rộng biên tìm kiếm tiến về phía đích.",
+      "Khi gặp tường chắn (màu xám than #1F2937), thuật toán tự động bỏ qua các ô này. Luồng sóng tìm kiếm phân tách và bẻ hướng vòng qua khe hở phía trên (hàng 0 - 1) và khe phía dưới để tiếp tục hành trình hướng về phía đích.",
+      "Ô Target [5, 19] chính thức được duyệt. Thuật toán kích hoạt quy trình Backtracking từ Target lần ngược theo các nút cha (cameFrom) về điểm Start. Dải đường đi ngắn nhất màu đỏ Techcombank #E31B23 rực rỡ phát sáng nổi bật toàn bộ ma trận lưới!"
+    ],
+    "packetLabels": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "sha256": "93a78927b1247d36351bd049927b6314d9f63e6ec92365a0d5b1b99b3c425a3d"
+  },
+  {
+    "id": "genetic-algorithm-ga",
+    "title": "Tối ưu hóa Bầy đàn & Giải thuật Di truyền (PSO & GA)",
+    "rendererType": "swarm-2d",
+    "steps": 5,
+    "stepTitles": [
+      "Khởi tạo Bầy hạt ngẫu nhiên (Generation 0)",
+      "Đánh giá Điểm thích nghi & Xác định gBest cục bộ",
+      "Cập nhật Vận tốc & Gia tốc Xã hội (Social Component)",
+      "Đột biến Tọa độ & Tránh Cực tiểu Cục bộ",
+      "Hội tụ Bầy đàn về Điểm Cực trị Toàn cục (Convergence)"
+    ],
+    "stepExplanations": [
+      "Các hạt nghiệm được rải ngẫu nhiên trên toàn bộ không gian tìm kiếm 2 chiều. Mỗi hạt khởi tạo vị trí ban đầu x_i và vận tốc v_i ngẫu nhiên để thăm dò toàn cục.",
+      "Thuật toán đánh giá hàm mục tiêu f(x) cho từng hạt. Hạt 3 đạt điểm thích nghi cao nhất (62.4) trở thành kim chỉ nam dẫn đường cho toàn bộ bầy đàn trong chu kỳ này.",
+      "Mỗi hạt gia tốc hướng về gBest nhờ lực hút xã hội c2*r2*(gBest - x_i). Các hạt ở xa (Hạt 1, Hạt 5) bứt tốc mạnh mẽ vượt qua các rào cản cục bộ.",
+      "Kỹ thuật đột biến Cauchy ngẫu nhiên đẩy nhẹ một số hạt để bầy đàn không bị mắc kẹt tại hố cực tiểu cục bộ (local minima), liên tục thăm dò các sườn đồi tiềm năng.",
+      "Vận tốc toàn bầy triệt tiêu dần về 0. Toàn bộ các hạt bao vây chặt chẽ tọa độ tối ưu (70, 50) với điểm thích nghi đạt đỉnh 98.5. Thuật toán chính thức hoàn tất chu trình."
+    ],
+    "packetLabels": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "sha256": "8f5aea36d5531caa0ef0985050e179468964e19118e7e816edcaf25bf250e92f"
+  },
+  {
+    "id": "load-balancer",
+    "title": "Layer 7 Load Balancer (Cân bằng tải Round-Robin)",
+    "rendererType": "flow-graph",
+    "steps": 5,
+    "stepTitles": [
+      "Tiếp nhận luồng Request đầu vào",
+      "Điều phối tới Server A theo Round-Robin",
+      "Điều phối yêu cầu kế tiếp tới Server B",
+      "Health Check & Phát hiện lỗi nút",
+      "Phản hồi kết quả về phía Client"
+    ],
+    "stepExplanations": [
+      "Client gửi yêu cầu HTTP GET /transactions đến địa chỉ IP công khai của Load Balancer.",
+      "Load Balancer chọn Server A cho yêu cầu đầu tiên và chuyển tiếp gói tin qua mạng nội bộ.",
+      "Yêu cầu tiếp theo được gán cho Server B để chia sẻ tải đều đặn, không để máy nào bị quá tải.",
+      "Load Balancer liên tục phát tín hiệu Health Check probe để đảm bảo các máy chủ luôn phản hồi tốt.",
+      "Server xử lý xong logic nghiệp vụ, Load Balancer gửi gói tin phản hồi HTTP 200 OK về Client an toàn."
+    ],
+    "packetLabels": [
+      [
+        "HTTP GET /tx"
+      ],
+      [
+        "Proxy GET -> Srv A"
+      ],
+      [
+        "Proxy GET -> Srv B"
+      ],
+      [
+        "Health Probe 200 OK"
+      ],
+      [
+        "HTTP 200 OK (Data)"
+      ]
+    ],
+    "sha256": "f0936882090c28a2fa020e7118a44f507eae1ef896bdcbac6210bbd4dc6718b0"
+  },
+  {
+    "id": "token-bucket",
+    "title": "Token Bucket Rate Limiter (Kiểm soát Tốc độ Yêu cầu)",
+    "rendererType": "flow-graph",
+    "steps": 4,
+    "stepTitles": [
+      "Làm đầy Token vào Xô với tốc độ cố định (Refill)",
+      "Yêu cầu hợp lệ tiêu thụ Token thành công",
+      "Lưu lượng đột biến (Traffic Burst)",
+      "Từ chối yêu cầu quá hạn ngạch (429 Rate Limit)"
+    ],
+    "stepExplanations": [
+      "Theo chu kỳ mỗi giây, bộ tạo sinh tự động cấp 10 token vào xô (Bucket Capacity = 10 token).",
+      "Một Request từ Client đến, lấy đi 1 token từ xô (còn lại 9 token) và được chuyển tiếp sang Backend.",
+      "Client gửi đồng loạt 9 yêu cầu. Toàn bộ 9 token còn lại bị tiêu thụ cạn kiệt, xô về mức 0.",
+      "Yêu cầu thứ 11 đến khi xô đã hết token. Yêu cầu bị Load Balancer chặn đứng ngay lập tức với mã HTTP 429."
+    ],
+    "packetLabels": [
+      [
+        "Refill +10 Tokens"
+      ],
+      [
+        "Consume Token -> Forward"
+      ],
+      [
+        "Burst Traffic (9 reqs)"
+      ],
+      [
+        "HTTP 429 Too Many Reqs"
+      ]
+    ],
+    "sha256": "066d83dcab63971be39583b27756fdda0d68f4aeddbf62c1554141755878ec0e"
+  }
+]

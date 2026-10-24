@@ -2,6 +2,8 @@ import { FC } from 'react';
 import { Chip, Button } from '@heroui/react';
 import { Search, Sparkles, Terminal, Loader2, X } from 'lucide-react';
 import { SimulationScenario } from '../types/simulation';
+import { getShortChipName } from '../services/capabilities';
+export { getShortChipName } from '../services/capabilities';
 
 interface HeroHeaderProps {
   scenarios: SimulationScenario[];
@@ -12,35 +14,6 @@ interface HeroHeaderProps {
   onGenerateWithGroq?: (query: string) => void;
   isGenerating?: boolean;
 }
-
-const getShortChipName = (s: SimulationScenario): string => {
-  switch (s.id) {
-    case 'apache-kafka':
-      return 'Kafka';
-    case 'redis-cache':
-      return 'Redis Cache';
-    case 'rag-pipeline':
-      return 'RAG Pipeline';
-    case 'quick-sort':
-      return 'QuickSort';
-    case 'binary-search':
-      return 'Binary Search';
-    case 'astar-dijkstra-grid':
-      return 'A* / Dijkstra';
-    case 'genetic-algorithm-ga':
-      return 'PSO / Swarm 2D';
-    case 'merge-sort':
-      return 'MergeSort (Tree)';
-    case 'bubble-sort':
-      return 'BubbleSort';
-    case 'load-balancer':
-      return 'Load Balancer';
-    case 'token-bucket':
-      return 'Rate Limiter';
-    default:
-      return s.title;
-  }
-};
 
 export const HeroHeader: FC<HeroHeaderProps> = ({
   scenarios,
@@ -76,7 +49,7 @@ export const HeroHeader: FC<HeroHeaderProps> = ({
           TechViz Sandbox <span className="font-light text-white/90">Encyclopedia</span>
         </h1>
         <p className="max-w-2xl text-white/90 text-sm sm:text-base mb-6 leading-relaxed">
-          Mô phỏng trực quan tương tác thuật toán &amp; công nghệ. Nhập chủ đề bất kỳ để tự động chọn visualizer và xem từng bước hoạt động sinh động.
+          Khám phá kịch bản thuật toán &amp; công nghệ đã được biên soạn. Với chủ đề khác, hệ thống sẽ kiểm tra khả năng hỗ trợ trước khi hiển thị mô phỏng.
         </p>
 
         {/* Central Search Bar with AI Generation Trigger (Padded container & borderless input) */}
@@ -91,7 +64,9 @@ export const HeroHeader: FC<HeroHeaderProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Nhập thuật toán hoặc công nghệ bất kỳ (VD: MergeSort, LRU Cache, BFS, RabbitMQ...)"
+              placeholder="Nhập thuật toán hoặc công nghệ (VD: Kafka, Bubble pass [3,1,2])"
+              aria-label="Chủ đề cần trực quan hóa"
+              maxLength={200}
               className="w-full bg-transparent border-0 outline-none text-xs sm:text-sm text-[#1A1A1A] placeholder:text-[#757575] font-medium py-2.5 focus:outline-none focus:ring-0"
               style={{
                 border: 'none',
@@ -129,7 +104,7 @@ export const HeroHeader: FC<HeroHeaderProps> = ({
                 )
               }
             >
-              {isGenerating ? 'Đang mô phỏng...' : 'Trực quan hóa'}
+              {isGenerating ? 'Đang kiểm tra...' : 'Trực quan hóa'}
             </Button>
           )}
         </div>
@@ -143,6 +118,9 @@ export const HeroHeader: FC<HeroHeaderProps> = ({
             const isSelected = scenario.id === activeScenarioId;
             return (
               <Chip
+                as="button"
+                type="button"
+                aria-pressed={isSelected}
                 key={scenario.id}
                 onClick={() => onSelectScenario(scenario)}
                 className={`cursor-pointer transition-all duration-200 font-semibold text-xs py-1 px-3 ${

@@ -1,0 +1,346 @@
+- main:
+  - text: A* & Dijkstra Pathfinding (Duyệt sóng & Tìm đường tối ưu) Graph & Pathfinding Minh họa biên soạn — chưa xác minh toàn bộ
+  - button "Thu gọn lý thuyết":
+    - img
+    - text: Thu gọn lý thuyết
+    - img
+  - text: Bước 1 / 4
+  - group: Nguồn và giới hạn
+  - img
+  - text: Bản chất & Mô hình Trực quan
+  - paragraph: "La bàn thông minh dẫn lối: Dijkstra lan truyền sóng tròn 360 độ mù quáng để tìm đường. A* kết hợp chi phí thực tế đã đi g(n) với một hàm la bàn ước lượng khoảng cách h(n) hướng thẳng về phía đích (Heuristic), giúp tập trung sóng tìm kiếm như đèn pha rọi đường."
+  - img
+  - text: Cơ sở Lý thuyết & Độ phức tạp
+  - paragraph: "Hàm đánh giá chi phí f(n) = g(n) + h(n). Nếu hàm heuristic h(n) chấp nhận được (Admissible: không bao giờ đánh giá quá cao chi phí thực tế), A* đảm bảo tìm ra đường đi ngắn nhất tuyệt đối. Độ phức tạp thời gian: O(E log V) với hàng đợi ưu tiên Min-Heap."
+  - img
+  - text: Ứng dụng Thực tiễn • Tìm đường bản đồ số Google Maps, Grab, Apple Maps • Điều hướng di chuyển của nhân vật (NPC Navigation Mesh) trong game 3D • Robot tự hành AGV tránh vật cản trong kho vận thông minh
+  - 'heading "Bước 1: Khởi tạo Start (S) và Target (T)" [level=3]'
+  - paragraph: Xác định tọa độ xuất phát Start (ô xanh lá [5, 2]) và điểm Đích Target (ô đỏ Techcombank [5, 19]). Thuật toán khởi tạo tập mở Open Set với nút Start, đặt g(S) = 0 và đánh giá khoảng cách Manhattan/Euclidean ban đầu h(S) đến đích.
+  - img
+  - text: "Mã giả / Công thức thực thi Step #1 Chưa có mã giả được kiểm chứng cho bước này."
+  - img
+  - text: Biến số & Trạng thái trực tiếp SNAPSHOT
+  - paragraph: Bước này chưa có dữ liệu biến trạng thái.
+  - text: Trạng thái theo từng bước TechViz Engine v2.0
+  - button "Bật kéo khung vẽ (Pan)":
+    - img
+  - button "Thu nhỏ (-)":
+    - img
+  - button "100%"
+  - button "Phóng to (+)":
+    - img
+  - button "Đặt lại khung nhìn (1:1)":
+    - img
+  - button "Phóng to toàn màn hình":
+    - img
+  - text: Trực quan hóa Tìm đường tối ưu (Grid Path Stage)
+  - img
+  - text: "Thuật toán: A* (Heuristic h)"
+  - img
+  - text: 8 Hướng (Đi chéo)
+  - img
+  - text: Chưa có dữ liệu trọng số
+  - img
+  - text: "Truy vết: BẬT"
+  - button "Tạo Mê cung":
+    - img
+    - text: Tạo Mê cung
+  - button "Xóa tường":
+    - img
+    - text: Xóa tường
+  - button "Kịch bản chuẩn":
+    - img
+    - text: Kịch bản chuẩn
+  - button "Ô [0, 0], trống"
+  - button "Ô [0, 1], trống"
+  - button "Ô [0, 2], trống"
+  - button "Ô [0, 3], trống"
+  - button "Ô [0, 4], trống"
+  - button "Ô [0, 5], trống"
+  - button "Ô [0, 6], trống"
+  - button "Ô [0, 7], trống"
+  - button "Ô [0, 8], trống"
+  - button "Ô [0, 9], trống"
+  - button "Ô [0, 10], trống"
+  - button "Ô [0, 11], trống"
+  - button "Ô [0, 12], trống"
+  - button "Ô [0, 13], trống"
+  - button "Ô [0, 14], trống"
+  - button "Ô [0, 15], trống"
+  - button "Ô [0, 16], trống"
+  - button "Ô [0, 17], trống"
+  - button "Ô [0, 18], trống"
+  - button "Ô [0, 19], trống"
+  - button "Ô [0, 20], trống"
+  - button "Ô [0, 21], trống"
+  - button "Ô [1, 0], trống"
+  - button "Ô [1, 1], trống"
+  - button "Ô [1, 2], trống"
+  - button "Ô [1, 3], trống"
+  - button "Ô [1, 4], trống"
+  - button "Ô [1, 5], trống"
+  - button "Ô [1, 6], trống"
+  - button "Ô [1, 7], trống"
+  - button "Ô [1, 8], trống"
+  - button "Ô [1, 9], trống"
+  - button "Ô [1, 10], trống"
+  - button "Ô [1, 11], trống"
+  - button "Ô [1, 12], trống"
+  - button "Ô [1, 13], trống"
+  - button "Ô [1, 14], trống"
+  - button "Ô [1, 15], trống"
+  - button "Ô [1, 16], trống"
+  - button "Ô [1, 17], trống"
+  - button "Ô [1, 18], trống"
+  - button "Ô [1, 19], trống"
+  - button "Ô [1, 20], trống"
+  - button "Ô [1, 21], trống"
+  - button "Ô [2, 0], trống"
+  - button "Ô [2, 1], trống"
+  - button "Ô [2, 2], trống"
+  - button "Ô [2, 3], trống"
+  - button "Ô [2, 4], trống"
+  - button "Ô [2, 5], trống"
+  - button "Ô [2, 6], trống"
+  - button "Ô [2, 7], trống"
+  - button "Ô [2, 8], trống"
+  - button "Ô [2, 9], trống"
+  - button "Ô [2, 10], tường"
+  - button "Ô [2, 11], trống"
+  - button "Ô [2, 12], trống"
+  - button "Ô [2, 13], trống"
+  - button "Ô [2, 14], tường"
+  - button "Ô [2, 15], trống"
+  - button "Ô [2, 16], trống"
+  - button "Ô [2, 17], trống"
+  - button "Ô [2, 18], trống"
+  - button "Ô [2, 19], trống"
+  - button "Ô [2, 20], trống"
+  - button "Ô [2, 21], trống"
+  - button "Ô [3, 0], trống"
+  - button "Ô [3, 1], trống"
+  - button "Ô [3, 2], trống"
+  - button "Ô [3, 3], trống"
+  - button "Ô [3, 4], trống"
+  - button "Ô [3, 5], trống"
+  - button "Ô [3, 6], trống"
+  - button "Ô [3, 7], trống"
+  - button "Ô [3, 8], trống"
+  - button "Ô [3, 9], trống"
+  - button "Ô [3, 10], tường"
+  - button "Ô [3, 11], trống"
+  - button "Ô [3, 12], trống"
+  - button "Ô [3, 13], trống"
+  - button "Ô [3, 14], tường"
+  - button "Ô [3, 15], trống"
+  - button "Ô [3, 16], trống"
+  - button "Ô [3, 17], trống"
+  - button "Ô [3, 18], trống"
+  - button "Ô [3, 19], trống"
+  - button "Ô [3, 20], trống"
+  - button "Ô [3, 21], trống"
+  - button "Ô [4, 0], trống"
+  - button "Ô [4, 1], trống"
+  - button "Ô [4, 2], trống"
+  - button "Ô [4, 3], trống"
+  - button "Ô [4, 4], trống"
+  - button "Ô [4, 5], trống"
+  - button "Ô [4, 6], trống"
+  - button "Ô [4, 7], trống"
+  - button "Ô [4, 8], trống"
+  - button "Ô [4, 9], trống"
+  - button "Ô [4, 10], tường"
+  - button "Ô [4, 11], trống"
+  - button "Ô [4, 12], trống"
+  - button "Ô [4, 13], trống"
+  - button "Ô [4, 14], tường"
+  - button "Ô [4, 15], trống"
+  - button "Ô [4, 16], trống"
+  - button "Ô [4, 17], trống"
+  - button "Ô [4, 18], trống"
+  - button "Ô [4, 19], trống"
+  - button "Ô [4, 20], trống"
+  - button "Ô [4, 21], trống"
+  - button "Ô [5, 0], trống"
+  - button "Ô [5, 1], trống"
+  - button "Ô [5, 2], xuất phát":
+    - img
+  - button "Ô [5, 3], trống"
+  - button "Ô [5, 4], trống"
+  - button "Ô [5, 5], trống"
+  - button "Ô [5, 6], trống"
+  - button "Ô [5, 7], trống"
+  - button "Ô [5, 8], trống"
+  - button "Ô [5, 9], trống"
+  - button "Ô [5, 10], tường"
+  - button "Ô [5, 11], trống"
+  - button "Ô [5, 12], trống"
+  - button "Ô [5, 13], trống"
+  - button "Ô [5, 14], tường"
+  - button "Ô [5, 15], trống"
+  - button "Ô [5, 16], trống"
+  - button "Ô [5, 17], trống"
+  - button "Ô [5, 18], trống"
+  - button "Ô [5, 19], đích":
+    - img
+  - button "Ô [5, 20], trống"
+  - button "Ô [5, 21], trống"
+  - button "Ô [6, 0], trống"
+  - button "Ô [6, 1], trống"
+  - button "Ô [6, 2], trống"
+  - button "Ô [6, 3], trống"
+  - button "Ô [6, 4], trống"
+  - button "Ô [6, 5], trống"
+  - button "Ô [6, 6], trống"
+  - button "Ô [6, 7], trống"
+  - button "Ô [6, 8], trống"
+  - button "Ô [6, 9], trống"
+  - button "Ô [6, 10], tường"
+  - button "Ô [6, 11], trống"
+  - button "Ô [6, 12], trống"
+  - button "Ô [6, 13], trống"
+  - button "Ô [6, 14], tường"
+  - button "Ô [6, 15], trống"
+  - button "Ô [6, 16], trống"
+  - button "Ô [6, 17], trống"
+  - button "Ô [6, 18], trống"
+  - button "Ô [6, 19], trống"
+  - button "Ô [6, 20], trống"
+  - button "Ô [6, 21], trống"
+  - button "Ô [7, 0], trống"
+  - button "Ô [7, 1], trống"
+  - button "Ô [7, 2], trống"
+  - button "Ô [7, 3], trống"
+  - button "Ô [7, 4], trống"
+  - button "Ô [7, 5], trống"
+  - button "Ô [7, 6], trống"
+  - button "Ô [7, 7], trống"
+  - button "Ô [7, 8], trống"
+  - button "Ô [7, 9], trống"
+  - button "Ô [7, 10], tường"
+  - button "Ô [7, 11], trống"
+  - button "Ô [7, 12], trống"
+  - button "Ô [7, 13], trống"
+  - button "Ô [7, 14], trống"
+  - button "Ô [7, 15], trống"
+  - button "Ô [7, 16], trống"
+  - button "Ô [7, 17], trống"
+  - button "Ô [7, 18], trống"
+  - button "Ô [7, 19], trống"
+  - button "Ô [7, 20], trống"
+  - button "Ô [7, 21], trống"
+  - button "Ô [8, 0], trống"
+  - button "Ô [8, 1], trống"
+  - button "Ô [8, 2], trống"
+  - button "Ô [8, 3], trống"
+  - button "Ô [8, 4], trống"
+  - button "Ô [8, 5], trống"
+  - button "Ô [8, 6], trống"
+  - button "Ô [8, 7], trống"
+  - button "Ô [8, 8], trống"
+  - button "Ô [8, 9], trống"
+  - button "Ô [8, 10], tường"
+  - button "Ô [8, 11], tường"
+  - button "Ô [8, 12], tường"
+  - button "Ô [8, 13], tường"
+  - button "Ô [8, 14], trống"
+  - button "Ô [8, 15], trống"
+  - button "Ô [8, 16], trống"
+  - button "Ô [8, 17], trống"
+  - button "Ô [8, 18], trống"
+  - button "Ô [8, 19], trống"
+  - button "Ô [8, 20], trống"
+  - button "Ô [8, 21], trống"
+  - button "Ô [9, 0], trống"
+  - button "Ô [9, 1], trống"
+  - button "Ô [9, 2], trống"
+  - button "Ô [9, 3], trống"
+  - button "Ô [9, 4], trống"
+  - button "Ô [9, 5], trống"
+  - button "Ô [9, 6], trống"
+  - button "Ô [9, 7], trống"
+  - button "Ô [9, 8], trống"
+  - button "Ô [9, 9], trống"
+  - button "Ô [9, 10], trống"
+  - button "Ô [9, 11], trống"
+  - button "Ô [9, 12], trống"
+  - button "Ô [9, 13], trống"
+  - button "Ô [9, 14], trống"
+  - button "Ô [9, 15], trống"
+  - button "Ô [9, 16], trống"
+  - button "Ô [9, 17], trống"
+  - button "Ô [9, 18], trống"
+  - button "Ô [9, 19], trống"
+  - button "Ô [9, 20], trống"
+  - button "Ô [9, 21], trống"
+  - button "Ô [10, 0], trống"
+  - button "Ô [10, 1], trống"
+  - button "Ô [10, 2], trống"
+  - button "Ô [10, 3], trống"
+  - button "Ô [10, 4], trống"
+  - button "Ô [10, 5], trống"
+  - button "Ô [10, 6], trống"
+  - button "Ô [10, 7], trống"
+  - button "Ô [10, 8], trống"
+  - button "Ô [10, 9], trống"
+  - button "Ô [10, 10], trống"
+  - button "Ô [10, 11], trống"
+  - button "Ô [10, 12], trống"
+  - button "Ô [10, 13], trống"
+  - button "Ô [10, 14], trống"
+  - button "Ô [10, 15], trống"
+  - button "Ô [10, 16], trống"
+  - button "Ô [10, 17], trống"
+  - button "Ô [10, 18], trống"
+  - button "Ô [10, 19], trống"
+  - button "Ô [10, 20], trống"
+  - button "Ô [10, 21], trống"
+  - button "Ô [11, 0], trống"
+  - button "Ô [11, 1], trống"
+  - button "Ô [11, 2], trống"
+  - button "Ô [11, 3], trống"
+  - button "Ô [11, 4], trống"
+  - button "Ô [11, 5], trống"
+  - button "Ô [11, 6], trống"
+  - button "Ô [11, 7], trống"
+  - button "Ô [11, 8], trống"
+  - button "Ô [11, 9], trống"
+  - button "Ô [11, 10], trống"
+  - button "Ô [11, 11], trống"
+  - button "Ô [11, 12], trống"
+  - button "Ô [11, 13], trống"
+  - button "Ô [11, 14], trống"
+  - button "Ô [11, 15], trống"
+  - button "Ô [11, 16], trống"
+  - button "Ô [11, 17], trống"
+  - button "Ô [11, 18], trống"
+  - button "Ô [11, 19], trống"
+  - button "Ô [11, 20], trống"
+  - button "Ô [11, 21], trống"
+  - img
+  - text: "Độ dài đường đi:"
+  - strong: Chưa có đường trong bước này
+  - img
+  - text: "Số ô đã duyệt:"
+  - strong: "1"
+  - text: (0.4% bản đồ)
+  - img
+  - text: Bước này chưa kết luận tìm được đường hay không. Xuất phát (S) Đích (T) Tường chắn Đã duyệt Đường ngắn nhất
+  - img
+  - text: Nhấn giữ chuột kéo trên lưới để vẽ hoặc xóa tường chắn. Thuật toán sẽ tự động tính lại đường đi ngay tức thì! Tiến trình kịch bản Hoàn thành 25%
+  - button "Chuyển đến Bước 1": B1
+  - button "Chuyển đến Bước 2": B2
+  - button "Chuyển đến Bước 3": B3
+  - button "Chuyển đến Bước 4": B4
+  - button "Về đầu kịch bản":
+    - img
+  - button "Bước trước" [disabled]:
+    - img
+  - button "Chạy tự động"
+  - button "Bước tiếp theo":
+    - img
+  - text: "Đang xem: Bước 1 / 4"
+  - img
+  - button "0.5x"
+  - button "1x" [pressed]
+  - button "2x"

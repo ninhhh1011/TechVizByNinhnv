@@ -1,0 +1,306 @@
+{
+  "date": "2026-10-22",
+  "rows": [
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "flow",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "array",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "grid",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "swarm",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "tree",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "flow",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "array",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "grid",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "swarm",
+      "verdict": "pass"
+    },
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "tree",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "flow",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "array",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "grid",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "swarm",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "tree",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "flow",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "array",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "grid",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "swarm",
+      "verdict": "pass"
+    },
+    {
+      "engine": "firefox",
+      "version": "157.0",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "tree",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "flow",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "array",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "grid",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "swarm",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "family": "tree",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "flow",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "array",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "grid",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "swarm",
+      "verdict": "pass"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "family": "tree",
+      "verdict": "pass"
+    }
+  ],
+  "limit": "Automated browser and accessibility-tree checks; no human screen-reader or learner verdict."
+}

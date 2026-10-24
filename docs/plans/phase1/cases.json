@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "coordinateConvention": "grid cells are [row,column], zero based; four-neighbor moves cost 1",
+  "cases": [
+    {
+      "id": "A1", "family": "array-pointer", "status": "verified-simulation",
+      "topic": "Bubble sort, one pass", "source": "src/data/morePresets.ts:147-234; independently calculated from adjacent compare/swap rule",
+      "input": { "array": [3, 1, 2] },
+      "frames": [
+        { "event": "initial", "array": [3, 1, 2] },
+        { "event": "compare(0,1)", "array": [3, 1, 2] },
+        { "event": "swap(0,1)", "array": [1, 3, 2] },
+        { "event": "compare(1,2)", "array": [1, 3, 2] },
+        { "event": "swap(1,2)", "array": [1, 2, 3], "sortedIndices": [2] }
+      ],
+      "limit": "One pass only; final order happens to be sorted for this input. No complexity claim.",
+      "learnerQuestion": "After the first swap, where is 3 and why?",
+      "expectedAnswer": "At index 1; 3 was greater than adjacent 1."
+    },
+    {
+      "id": "A2", "family": "array-pointer", "status": "verified-simulation",
+      "topic": "Binary search, absent value", "source": "src/data/arrayPresets.ts:256-317; independently calculated midpoint rule",
+      "input": { "array": [1, 3, 5, 7], "target": 4 },
+      "frames": [
+        { "event": "initial", "lo": 0, "hi": 3 },
+        { "event": "compare(mid=1,value=3)", "lo": 2, "hi": 3 },
+        { "event": "compare(mid=2,value=5)", "lo": 2, "hi": 1 },
+        { "event": "not-found", "result": -1 }
+      ],
+      "limit": "Input must be ascending; no claim for unsorted input.",
+      "learnerQuestion": "Why does the search stop without comparing 7?",
+      "expectedAnswer": "After comparing 5, lo exceeds hi, so no candidate index remains."
+    },
+    {
+      "id": "G1", "family": "grid-path", "status": "verified-simulation",
+      "topic": "Shortest four-neighbor route", "source": "src/data/gridPresets.ts:3-30; route checked by four-neighbor enumeration",
+      "input": { "rows": 2, "cols": 3, "start": [0, 0], "end": [0, 2], "walls": [[0, 1]], "diagonal": false },
+      "frames": [
+        { "event": "initial", "current": [0, 0], "path": [] },
+        { "event": "visit", "current": [1, 0], "path": [[0, 0], [1, 0]] },
+        { "event": "visit", "current": [1, 1], "path": [[0, 0], [1, 0], [1, 1]] },
+        { "event": "visit", "current": [1, 2], "path": [[0, 0], [1, 0], [1, 1], [1, 2]] },
+        { "event": "found", "current": [0, 2], "path": [[0, 0], [1, 0], [1, 1], [1, 2], [0, 2]], "cost": 4 }
+      ],
+      "limit": "Oracle is for unit-cost four-neighbor movement; diagonal policy is separate.",
+      "learnerQuestion": "Why can the route not go straight along row 0?",
+      "expectedAnswer": "Cell [0,1] is a wall."
+    },
+    {
+      "id": "G2", "family": "grid-path", "status": "verified-simulation",
+      "topic": "Blocked destination", "source": "src/data/gridPresets.ts:3-30; exhaustive reachability on 2x2 grid",
+      "input": { "rows": 2, "cols": 2, "start": [0, 0], "end": [1, 1], "walls": [[0, 1], [1, 0]], "diagonal": false },
+      "frames": [
+        { "event": "initial", "current": [0, 0], "path": [] },
+        { "event": "exhausted", "visited": [[0, 0]], "path": [], "result": "no-path" }
+      ],
+      "limit": "Do not show no-path on the initial frame; diagonal movement would change the result.",
+      "learnerQuestion": "Does the initial frame prove there is no route?",
+      "expectedAnswer": "No. The result follows only after the reachable cells are exhausted."
+    },
+    {
+      "id": "F1", "family": "flow-graph", "status": "illustrative",
+      "topic": "Round-robin request routing", "source": "src/data/morePresets.ts:236-306; curated example, not evidence of a deployed load balancer",
+      "input": { "nodes": ["client", "lb", "a", "b"], "healthy": ["a", "b"], "requests": ["r1", "r2"] },
+      "frames": [
+        { "event": "r1:client->lb", "request": "r1", "at": "lb" },
+        { "event": "r1:lb->a", "request": "r1", "at": "a" },
+        { "event": "r2:client->lb", "request": "r2", "at": "lb" },
+        { "event": "r2:lb->b", "request": "r2", "at": "b" }
+      ],
+      "limit": "Shows one valid policy trace; no latency, failover or fairness guarantee.",
+      "learnerQuestion": "Where does r2 go in this example?",
+      "expectedAnswer": "To b, the next healthy backend in the curated sequence."
+    },
+    {
+      "id": "F2", "family": "flow-graph", "status": "illustrative",
+      "topic": "Cache miss then fill", "source": "src/data/presets.ts:251-475; curated Redis-like flow, not a live Redis trace",
+      "input": { "nodes": ["client", "api", "cache", "db"], "key": "k", "cache": {}, "database": { "k": "v" } },
+      "frames": [
+        { "event": "client->api", "key": "k", "at": "api" },
+        { "event": "api->cache", "key": "k", "at": "cache" },
+        { "event": "cache-miss", "key": "k", "at": "api" },
+        { "event": "api->db", "key": "k", "at": "db" },
+        { "event": "db-response", "key": "k", "value": "v", "at": "api" },
+        { "event": "cache-fill", "cache": { "k": "v" }, "at": "cache" }
+      ],
+      "limit": "No claim that every cache implementation has this consistency or timing.",
+      "learnerQuestion": "Why is the database contacted in this trace?",
+      "expectedAnswer": "The cache had no value for k."
+    },
+    {
+      "id": "S1", "family": "swarm-2d", "status": "illustrative",
+      "topic": "Maximize a declared score", "source": "src/data/geneticAlgorithmPreset.ts:3-28; synthetic score values chosen for this fixture",
+      "input": { "objective": "maximize", "particles": [{ "id": "p1", "fitness": 2 }, { "id": "p2", "fitness": 5 }], "scoreUpdates": [{ "particleId": "p1", "fitness": 6 }] },
+      "frames": [
+        { "event": "observe", "fitness": { "p1": 2, "p2": 5 }, "bestId": "p2", "bestFitness": 5 },
+        { "event": "update", "fitness": { "p1": 6, "p2": 5 }, "bestId": "p1", "bestFitness": 6 }
+      ],
+      "limit": "Scores are supplied, not derived from positions; no convergence or global-optimum claim.",
+      "learnerQuestion": "Why does the best label move to p1?",
+      "expectedAnswer": "The declared objective is maximize and p1's new score is 6."
+    },
+    {
+      "id": "S2", "family": "swarm-2d", "status": "illustrative",
+      "topic": "Minimize a declared score", "source": "src/data/geneticAlgorithmPreset.ts:3-28; counterexample to choosing nearest position or greatest fitness",
+      "input": { "objective": "minimize", "particles": [{ "id": "p1", "fitness": 2, "x": 90 }, { "id": "p2", "fitness": 5, "x": 0 }], "scoreUpdates": [{ "particleId": "p2", "fitness": 1 }] },
+      "frames": [
+        { "event": "observe", "fitness": { "p1": 2, "p2": 5 }, "bestId": "p1", "bestFitness": 2 },
+        { "event": "update", "fitness": { "p1": 2, "p2": 1 }, "bestId": "p2", "bestFitness": 1 }
+      ],
+      "limit": "Position is irrelevant to this declared score; no motion model is asserted.",
+      "learnerQuestion": "Can distance on screen identify the best particle here?",
+      "expectedAnswer": "No. The supplied score and minimize objective determine it."
+    },
+    {
+      "id": "T1", "family": "tree-graph", "status": "verified-simulation",
+      "topic": "Merge-sort split and merge", "source": "src/data/morePresets.ts:6-145; hand-derived split and stable merge",
+      "input": { "array": [3, 1, 2] },
+      "frames": [
+        { "event": "root", "nodes": [{ "id": "r", "parentId": null, "value": [3, 1, 2] }] },
+        { "event": "split", "nodes": [{ "id": "r", "parentId": null, "value": [3, 1, 2] }, { "id": "l", "parentId": "r", "value": [3] }, { "id": "q", "parentId": "r", "value": [1, 2] }] },
+        { "event": "merge", "nodes": [{ "id": "r", "parentId": null, "value": [1, 2, 3] }, { "id": "l", "parentId": "r", "value": [3] }, { "id": "q", "parentId": "r", "value": [1, 2] }] }
+      ],
+      "limit": "Intermediate split of [1,2] is omitted from visual frames; merge result is independently calculated.",
+      "learnerQuestion": "Which child contains the original 3?",
+      "expectedAnswer": "Node l, the left child of r."
+    },
+    {
+      "id": "T2", "family": "tree-graph", "status": "verified-simulation",
+      "topic": "Asymmetric binary-search tree insertion", "source": "src/components/TreeGraphRenderer.tsx:23-89; hand-derived BST insert rule",
+      "input": { "insert": [4, 2, 3] },
+      "frames": [
+        { "event": "insert(4)", "nodes": [{ "id": "n4", "parentId": null, "value": 4 }] },
+        { "event": "insert(2)", "nodes": [{ "id": "n4", "parentId": null, "value": 4 }, { "id": "n2", "parentId": "n4", "value": 2, "side": "left" }] },
+        { "event": "insert(3)", "nodes": [{ "id": "n4", "parentId": null, "value": 4 }, { "id": "n2", "parentId": "n4", "value": 2, "side": "left" }, { "id": "n3", "parentId": "n2", "value": 3, "side": "right" }] }
+      ],
+      "limit": "No balancing, deletion or duplicate-key policy is implied.",
+      "learnerQuestion": "Why is 3 under 2 rather than directly under 4?",
+      "expectedAnswer": "3 is less than 4 but greater than 2."
+    },
+    {
+      "id": "U1", "family": "unsupported", "status": "unsupported",
+      "topic": "Arbitrary quantum algorithm request", "source": "docs/plans/MASTER_PLAN.md:1; no reviewed runner, trace or invariant in this repository",
+      "input": { "query": "Mô phỏng mọi thuật toán lượng tử" },
+      "frames": [],
+      "limit": "Offer a static explanation only after source review; do not invent nodes, steps or Big-O.",
+      "learnerQuestion": "Did the app run or verify a quantum algorithm?",
+      "expectedAnswer": "No; this topic has no verified simulation here."
+    }
+  ]
+}

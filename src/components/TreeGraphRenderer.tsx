@@ -2,10 +2,12 @@ import React, { FC, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { GitBranch, Sparkles } from 'lucide-react';
 import { SimulationStep, TreeNodeItem } from '../types/simulation';
+import { layoutTree } from '../utils/renderState';
 
 export interface TreeGraphRendererProps {
   step: SimulationStep;
   speed?: number;
+  isPlaying?: boolean;
 }
 
 interface ComputedNodePosition {
@@ -17,6 +19,7 @@ interface ComputedNodePosition {
 export const TreeGraphRenderer: FC<TreeGraphRendererProps> = ({
   step,
   speed = 1,
+  isPlaying = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,35 +46,12 @@ export const TreeGraphRenderer: FC<TreeGraphRendererProps> = ({
 
   // 2. Group nodes by level and compute layout positions
   const { positionsMap, maxLevel, connections } = useMemo(() => {
-    const map = new Map<string, ComputedNodePosition>();
+    const map = layoutTree(treeNodes);
     if (treeNodes.length === 0) {
       return { positionsMap: map, maxLevel: 0, connections: [] };
     }
 
-    const levelMap = new Map<number, TreeNodeItem[]>();
-    let highestLevel = 0;
-
-    treeNodes.forEach((node) => {
-      const lvl = node.level ?? 0;
-      highestLevel = Math.max(highestLevel, lvl);
-      const list = levelMap.get(lvl) || [];
-      list.push(node);
-      levelMap.set(lvl, list);
-    });
-
-    levelMap.forEach((nodesInLevel, level) => {
-      const count = nodesInLevel.length;
-      const yStep = highestLevel === 0 ? 50 : 16 + (level / highestLevel) * 68;
-
-      nodesInLevel.forEach((node, idx) => {
-        const xStep = count === 1 ? 50 : 12 + ((idx + 0.5) / count) * 76;
-        map.set(node.id, {
-          x: xStep,
-          y: yStep,
-          node,
-        });
-      });
-    });
+    const highestLevel = Math.max(...[...map.values()].map((position) => position.depth));
 
     const links: Array<{ fromId: string; toId: string; fromPos: ComputedNodePosition; toPos: ComputedNodePosition }> = [];
     treeNodes.forEach((node) => {
@@ -95,7 +75,7 @@ export const TreeGraphRenderer: FC<TreeGraphRendererProps> = ({
     duration: Math.max(0.3, 0.8 / speed),
   };
 
-  if (!treeData || treeNodes.length === 0) {
+  if (!treeData || treeNodes.length === 0 || positionsMap.size !== treeNodes.length) {
     return (
       <div className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-8 flex flex-col items-center justify-center text-center">
         <div className="w-12 h-12 rounded-xl bg-red-50 text-[#E31B23] flex items-center justify-center mb-3">
@@ -116,6 +96,9 @@ export const TreeGraphRenderer: FC<TreeGraphRendererProps> = ({
       ref={containerRef}
       className="relative w-full h-full min-h-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-hidden flex flex-col justify-between select-none font-['Plus_Jakarta_Sans',sans-serif]"
     >
+      <ul className="sr-only" aria-label="Quan hệ cha con">
+        {treeNodes.map((node) => <li key={node.id}>{node.label}: {node.parentId ? `con của ${treeNodes.find((parent) => parent.id === node.parentId)?.label}` : 'gốc'}</li>)}
+      </ul>
       {/* Background Architectural Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#F1F5F9_1px,transparent_1px),linear-gradient(to_bottom,#F1F5F9_1px,transparent_1px)] bg-[size:28px_28px] opacity-70 pointer-events-none" />
 
@@ -167,7 +150,7 @@ export const TreeGraphRenderer: FC<TreeGraphRendererProps> = ({
                   strokeDasharray={isConnectingActive ? '6 4' : '3 3'}
                   className="transition-all duration-300"
                 >
-                  {isConnectingActive && (
+                  {isConnectingActive && isPlaying && (
                     <animate
                       attributeName="stroke-dashoffset"
                       from="20"
@@ -195,9 +178,9 @@ export const TreeGraphRenderer: FC<TreeGraphRendererProps> = ({
             <motion.div
               key={node.id}
               layout
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={isPlaying ? { scale: 0.8, opacity: 0 } : false}
               animate={{ scale: 1, opacity: 1, left: `${pos.x}%`, top: `${pos.y}%` }}
-              transition={springTransition}
+              transition={isPlaying ? springTransition : { duration: 0 }}
               className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer group"
             >
               <div

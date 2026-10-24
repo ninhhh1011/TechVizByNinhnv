@@ -1,0 +1,82 @@
+- main:
+  - text: Tối ưu hóa Bầy đàn & Giải thuật Di truyền (PSO & GA) Optimization & AI Minh họa biên soạn — chưa xác minh toàn bộ
+  - button "Thu gọn lý thuyết":
+    - img
+    - text: Thu gọn lý thuyết
+    - img
+  - text: Bước 1 / 5
+  - group: Nguồn và giới hạn
+  - img
+  - text: Bản chất & Mô hình Trực quan
+  - paragraph: "Hình tượng đàn chim bay tìm thức ăn: không con nào biết chính xác thức ăn ở đâu, nhưng mỗi con chim đều biết vị trí tốt nhất nó từng thấy (pBest) và cả đàn cùng chia sẻ thông tin con chim nào đang ở gần thức ăn nhất (gBest). Bằng cách kết hợp quán tính và lực hút xã hội, cả đàn sẽ nhanh chóng tìm ra nguồn thức ăn."
+  - img
+  - text: Cơ sở Lý thuyết & Độ phức tạp
+  - paragraph: "Phương trình cập nhật vận tốc: v_i(t+1) = w*v_i(t) + c1*r1*(pBest_i - x_i(t)) + c2*r2*(gBest - x_i(t)). Độ phức tạp: O(I * P * D) với I là số vòng lặp, P là số lượng hạt, D là số chiều không gian."
+  - img
+  - text: Ứng dụng Thực tiễn • Huấn luyện mạng nơ-ron sâu (Neural Network Hyperparameter Tuning) • Tối ưu hóa hành trình xe tải & logistics hàng không • Thiết kế ăng-ten siêu tần & tối ưu kết cấu kỹ thuật cơ khí
+  - heading "Khởi tạo Bầy hạt ngẫu nhiên (Generation 0)" [level=3]
+  - paragraph: Các hạt nghiệm được rải ngẫu nhiên trên toàn bộ không gian tìm kiếm 2 chiều. Mỗi hạt khởi tạo vị trí ban đầu x_i và vận tốc v_i ngẫu nhiên để thăm dò toàn cục.
+  - img
+  - text: "Mã giả / Công thức thực thi Step #1 for each particle i: x_i = random(X_MIN, X_MAX); v_i = random(V_MIN, V_MAX); pBest_i = x_i;"
+  - img
+  - text: Biến số & Trạng thái trực tiếp SNAPSHOT Số lượng hạt (P) 6 cá thể Vị trí gBest (68, 48) Điểm thích nghi cao nhất 62.4 / 100 Hệ số quán tính (w) 0.729 Trạng thái theo từng bước TechViz Engine v2.0
+  - button "Bật kéo khung vẽ (Pan)":
+    - img
+  - button "Thu nhỏ (-)":
+    - img
+  - button "100%"
+  - button "Phóng to (+)":
+    - img
+  - button "Đặt lại khung nhìn (1:1)":
+    - img
+  - button "Phóng to toàn màn hình":
+    - img
+  - list "Trạng thái các hạt":
+    - listitem: "Hạt 1: x=20, y=25, fitness=38.2"
+    - listitem: "Hạt 2: x=35, y=75, fitness=45"
+    - listitem: "Hạt 3: x=62, y=35, fitness=62.4, dẫn đầu theo dữ liệu được khai báo"
+    - listitem: "Hạt 4: x=80, y=85, fitness=41.5"
+    - listitem: "Hạt 5: x=15, y=60, fitness=32"
+    - listitem: "Hạt 6: x=85, y=20, fitness=49"
+  - img
+  - text: Không gian Bầy đàn & Hàm Mục tiêu (Swarm 2D Stage)
+  - img
+  - text: "Vòng lặp: #1"
+  - img
+  - text: "Số hạt: 6 Trục X → ↑ Trục Y"
+  - img
+  - text: Mục tiêu khai báo (70, 50)
+  - img
+  - text: "Hạt 1 f: 38.2"
+  - img
+  - text: "Hạt 2 f: 45.0"
+  - img
+  - img
+  - text: "f: 62.4"
+  - img
+  - text: "Hạt 4 f: 41.5"
+  - img
+  - text: "Hạt 5 f: 32.0"
+  - img
+  - text: "Hạt 6 f: 49.0 Mục tiêu:"
+  - strong: (70, 50)
+  - text: "• Dẫn đầu:"
+  - strong: Hạt 3
+  - text: (f = 62.4) Vị trí hiện tại Vector vận tốc được khai báo Tiến trình kịch bản Hoàn thành 20%
+  - button "Chuyển đến Bước 1": B1
+  - button "Chuyển đến Bước 2": B2
+  - button "Chuyển đến Bước 3": B3
+  - button "Chuyển đến Bước 4": B4
+  - button "Chuyển đến Bước 5": B5
+  - button "Về đầu kịch bản":
+    - img
+  - button "Bước trước" [disabled]:
+    - img
+  - button "Chạy tự động"
+  - button "Bước tiếp theo":
+    - img
+  - text: "Đang xem: Bước 1 / 5"
+  - img
+  - button "0.5x"
+  - button "1x" [pressed]
+  - button "2x"

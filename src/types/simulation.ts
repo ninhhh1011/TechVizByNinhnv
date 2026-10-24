@@ -45,6 +45,7 @@ export interface GridStepData {
   current?: [number, number];
   path?: [number, number][];
   heuristic?: 'manhattan' | 'euclidean' | 'none';
+  result?: 'found' | 'no-path' | string;
 }
 
 export interface SwarmParticle {
@@ -59,6 +60,7 @@ export interface SwarmParticle {
 }
 
 export interface SwarmStepData {
+  objective?: 'min' | 'max';
   target?: { x: number; y: number; label?: string; value?: number };
   particles: SwarmParticle[];
   iteration?: number;
@@ -75,6 +77,7 @@ export interface TreeNodeItem {
   parentId?: string; // ID node cha
   status?: 'default' | 'visiting' | 'visited' | 'highlight';
   details?: string;
+  side?: 'left' | 'right';
 }
 
 export interface TreeStepData {
@@ -140,6 +143,7 @@ export interface SimulationStep {
 export type RendererType = 'flow-graph' | 'array-pointer' | 'grid-path' | 'swarm-2d' | 'tree-graph';
 
 export interface SimulationScenario {
+  evidence?: { status: 'verified-simulation' | 'illustrative'; source: string; limit: string };
   id: string;
   title: string;
   subtitle?: string;

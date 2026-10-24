@@ -1,0 +1,234 @@
+[
+  {
+    "id": "A1",
+    "family": "array-pointer",
+    "status": "verified-simulation",
+    "topic": "Bubble sort, one pass",
+    "source": "src/data/morePresets.ts:147-234; independently calculated from adjacent compare/swap rule",
+    "input": {
+      "array": [
+        3,
+        1,
+        2
+      ]
+    },
+    "limit": "One pass only; final order happens to be sorted for this input. No complexity claim."
+  },
+  {
+    "id": "A2",
+    "family": "array-pointer",
+    "status": "verified-simulation",
+    "topic": "Binary search, absent value",
+    "source": "src/data/arrayPresets.ts:256-317; independently calculated midpoint rule",
+    "input": {
+      "array": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "target": 4
+    },
+    "limit": "Input must be ascending; no claim for unsorted input."
+  },
+  {
+    "id": "G1",
+    "family": "grid-path",
+    "status": "verified-simulation",
+    "topic": "Shortest four-neighbor route",
+    "source": "src/data/gridPresets.ts:3-30; route checked by four-neighbor enumeration",
+    "input": {
+      "rows": 2,
+      "cols": 3,
+      "start": [
+        0,
+        0
+      ],
+      "end": [
+        0,
+        2
+      ],
+      "walls": [
+        [
+          0,
+          1
+        ]
+      ],
+      "diagonal": false
+    },
+    "limit": "Oracle is for unit-cost four-neighbor movement; diagonal policy is separate."
+  },
+  {
+    "id": "G2",
+    "family": "grid-path",
+    "status": "verified-simulation",
+    "topic": "Blocked destination",
+    "source": "src/data/gridPresets.ts:3-30; exhaustive reachability on 2x2 grid",
+    "input": {
+      "rows": 2,
+      "cols": 2,
+      "start": [
+        0,
+        0
+      ],
+      "end": [
+        1,
+        1
+      ],
+      "walls": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "diagonal": false
+    },
+    "limit": "Do not show no-path on the initial frame; diagonal movement would change the result."
+  },
+  {
+    "id": "F1",
+    "family": "flow-graph",
+    "status": "illustrative",
+    "topic": "Round-robin request routing",
+    "source": "src/data/morePresets.ts:236-306; curated example, not evidence of a deployed load balancer",
+    "input": {
+      "nodes": [
+        "client",
+        "lb",
+        "a",
+        "b"
+      ],
+      "healthy": [
+        "a",
+        "b"
+      ],
+      "requests": [
+        "r1",
+        "r2"
+      ]
+    },
+    "limit": "Shows one valid policy trace; no latency, failover or fairness guarantee."
+  },
+  {
+    "id": "F2",
+    "family": "flow-graph",
+    "status": "illustrative",
+    "topic": "Cache miss then fill",
+    "source": "src/data/presets.ts:251-475; curated Redis-like flow, not a live Redis trace",
+    "input": {
+      "nodes": [
+        "client",
+        "api",
+        "cache",
+        "db"
+      ],
+      "key": "k",
+      "cache": {},
+      "database": {
+        "k": "v"
+      }
+    },
+    "limit": "No claim that every cache implementation has this consistency or timing."
+  },
+  {
+    "id": "S1",
+    "family": "swarm-2d",
+    "status": "illustrative",
+    "topic": "Maximize a declared score",
+    "source": "src/data/geneticAlgorithmPreset.ts:3-28; synthetic score values chosen for this fixture",
+    "input": {
+      "objective": "maximize",
+      "particles": [
+        {
+          "id": "p1",
+          "fitness": 2
+        },
+        {
+          "id": "p2",
+          "fitness": 5
+        }
+      ],
+      "scoreUpdates": [
+        {
+          "particleId": "p1",
+          "fitness": 6
+        }
+      ]
+    },
+    "limit": "Scores are supplied, not derived from positions; no convergence or global-optimum claim."
+  },
+  {
+    "id": "S2",
+    "family": "swarm-2d",
+    "status": "illustrative",
+    "topic": "Minimize a declared score",
+    "source": "src/data/geneticAlgorithmPreset.ts:3-28; counterexample to choosing nearest position or greatest fitness",
+    "input": {
+      "objective": "minimize",
+      "particles": [
+        {
+          "id": "p1",
+          "fitness": 2,
+          "x": 90
+        },
+        {
+          "id": "p2",
+          "fitness": 5,
+          "x": 0
+        }
+      ],
+      "scoreUpdates": [
+        {
+          "particleId": "p2",
+          "fitness": 1
+        }
+      ]
+    },
+    "limit": "Position is irrelevant to this declared score; no motion model is asserted."
+  },
+  {
+    "id": "T1",
+    "family": "tree-graph",
+    "status": "verified-simulation",
+    "topic": "Merge-sort split and merge",
+    "source": "src/data/morePresets.ts:6-145; hand-derived split and stable merge",
+    "input": {
+      "array": [
+        3,
+        1,
+        2
+      ]
+    },
+    "limit": "Intermediate split of [1,2] is omitted from visual frames; merge result is independently calculated."
+  },
+  {
+    "id": "T2",
+    "family": "tree-graph",
+    "status": "verified-simulation",
+    "topic": "Asymmetric binary-search tree insertion",
+    "source": "src/components/TreeGraphRenderer.tsx:23-89; hand-derived BST insert rule",
+    "input": {
+      "insert": [
+        4,
+        2,
+        3
+      ]
+    },
+    "limit": "No balancing, deletion or duplicate-key policy is implied."
+  },
+  {
+    "id": "U1",
+    "family": "unsupported",
+    "status": "unsupported",
+    "topic": "Arbitrary quantum algorithm request",
+    "source": "docs/plans/MASTER_PLAN.md:1; no reviewed runner, trace or invariant in this repository",
+    "input": {
+      "query": "Mô phỏng mọi thuật toán lượng tử"
+    },
+    "limit": "Offer a static explanation only after source review; do not invent nodes, steps or Big-O."
+  }
+]

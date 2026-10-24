@@ -27,24 +27,21 @@ export const StorytellerBanner: FC<StorytellerBannerProps> = ({
 }) => {
   const [isOverviewExpanded, setIsOverviewExpanded] = useState(true);
 
-  // Fallback mental model & complexity if academicOverview is not explicitly present
   const academic = scenario.academicOverview;
   const mentalModel =
     academic?.mentalModel ||
     scenario.summary ||
     scenario.subtitle ||
     scenario.description ||
-    'Hiểu nhanh nguyên lý hoạt động cốt lõi của chủ đề.';
+    'Chưa có mô tả được biên soạn cho chủ đề này.';
 
   const complexityOrPrinciple =
     academic?.complexityOrPrinciple ||
-    (scenario.category === 'Algorithms'
-      ? 'Độ phức tạp thời gian: O(N log N) trung bình, không gian bộ nhớ: O(1) - O(N).'
-      : 'Nguyên lý hệ thống: Tính khả dụng cao (HA), phân vùng dữ liệu và đảm bảo tính nhất quán cuối cùng.');
+    'Chưa có phân tích được kiểm chứng cho chủ đề này.';
 
   const useCases = academic?.useCases && academic.useCases.length > 0
     ? academic.useCases
-    : scenario.tags || ['Tối ưu hóa', 'Hệ thống chịu tải', 'Kỹ thuật phần mềm'];
+    : [];
 
   // Step state mutation or variables
   const stateVars = step.stateVariables || step.stateMutation || (
@@ -66,11 +63,9 @@ export const StorytellerBanner: FC<StorytellerBannerProps> = ({
             <span className="text-[11px] font-bold text-[#E31B23] bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full">
               {scenario.category || 'Thuật toán & Hệ thống'}
             </span>
-            {scenario.rendererType && (
-              <span className="text-[10px] font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
-                Mode: {scenario.rendererType}
-              </span>
-            )}
+            <span className="text-[10px] text-gray-600 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+              {scenario.evidence?.status === 'verified-simulation' ? 'Mô phỏng đã kiểm chứng trong phạm vi nêu dưới' : 'Minh họa biên soạn — chưa xác minh toàn bộ'}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -89,6 +84,12 @@ export const StorytellerBanner: FC<StorytellerBannerProps> = ({
             </div>
           </div>
         </div>
+
+        <details className="mt-3 text-xs text-gray-600">
+          <summary className="cursor-pointer font-semibold">Nguồn và giới hạn</summary>
+          <p className="mt-1">{scenario.evidence?.source || `Preset ${scenario.id}; chưa có xác nhận chuyên gia cho toàn bộ nội dung.`}</p>
+          <p className="mt-1">{scenario.evidence?.limit || 'Các bước minh họa một tình huống được biên soạn; không chứng minh mọi đầu vào hoặc hệ thống thực tế.'}</p>
+        </details>
 
         {/* 3 Academic Pillars Grid (Collapsible) */}
         {isOverviewExpanded && (
@@ -173,7 +174,7 @@ export const StorytellerBanner: FC<StorytellerBannerProps> = ({
               </span>
             </div>
             <pre className="font-mono text-xs text-red-200/90 whitespace-pre-wrap break-words leading-relaxed overflow-x-hidden">
-              {step.logicCode || `// Thực thi bước ${step.stepIndex}: ${step.title}\nexecute(${step.stepIndex});`}
+              {step.logicCode || 'Chưa có mã giả được kiểm chứng cho bước này.'}
             </pre>
           </div>
 
@@ -186,7 +187,7 @@ export const StorytellerBanner: FC<StorytellerBannerProps> = ({
                   Biến số &amp; Trạng thái trực tiếp
                 </span>
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                  LIVE MUTATION
+                  SNAPSHOT
                 </span>
               </div>
 
@@ -208,13 +209,13 @@ export const StorytellerBanner: FC<StorytellerBannerProps> = ({
                 </div>
               ) : (
                 <p className="text-xs text-gray-500 italic">
-                  Đang ghi nhận biến số trạng thái...
+                  Bước này chưa có dữ liệu biến trạng thái.
                 </p>
               )}
             </div>
 
             <div className="mt-2.5 pt-2 border-t border-gray-200/80 flex items-center justify-between text-[10px] text-gray-500">
-              <span>Đồng bộ thời gian thực theo từng nhịp mô phỏng</span>
+              <span>Trạng thái theo từng bước</span>
               <span className="font-bold text-[#E31B23]">TechViz Engine v2.0</span>
             </div>
           </div>
